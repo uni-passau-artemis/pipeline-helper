@@ -1,0 +1,18 @@
+WARNING: Couldn't find tool init file
+Test run by jenkins on Tue Mar 29 09:22:08 2022
+Native configuration is x86_64-pc-linux-gnu
+
+		=== ggt tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+Using ./config/default.exp as tool-and-target-specific interface file.
+spawn java -cp ../target/classes gcd.Shell
+gcd> Running ./gcd.tests/public.exp ...
+got a TERM signal, terminated
+
+		=== dtm Summary ===
