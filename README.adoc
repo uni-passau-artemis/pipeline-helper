@@ -1,0 +1,55 @@
+= Artemis Pipeline Helpers
+
+:url-dejagnu: https://www.gnu.org/software/dejagnu/
+:url-jenkins-plugin: https://github.com/ls1intum/jenkins-server-notification-plugin
+
+
+Various ports of checkers used in Praktomat to Java for easy integration into the Artemis CI-Workflow on Jenkins.
+
+Runs any combination of checkers to produce files readable by the Jenkins plugin which then in turn can send this information to Artemis.
+The DejagnuLogChecker and SimpleMessageWrapper can be specified multiple times with different testNames each time to allow e.g. to parse public, advanced, and secret tests in a single pass.
+
+The output format is specified in the link:{url-dejagnu}[Jenkins Plugin’s README].
+It is represented in this program by `CheckerResult.java`.
+
+
+== Implemented Checkers
+
+DejagnuLogChecker::
+  Parses a link:{url-dejagnu}[Dejagnu] log file.
+  Always puts the trimmed log file into the message to the student, even for successful tests.
+
+FileExistsChecker::
+  Checks for a list of files that they exist and are not empty.
+  Lists violations in the message to the student.
+
+LineLengthChecker::
+  Checks for all files with a certain extension in a directory that their line length is shorter than the specified maximum.
+  Lists the number of violations per file in the message to the student.
+
+MainMethodChecker::
+  Checks all `*.java` files in the given directory for `main`-methods.
+  The test succeeds if a unique main method has been found.
+  The message to the student contains
+    * if a unique method has been found: the file with it.
+    * if no `main`-method has been found: an informational message explaining this.
+    * if multiple `main`-methods have been found: the list of files with `main`-methods.
+
+SimpleMessageChecker::
+  Tries to transform the given parameters directly into a valid `CheckerResult`-file in the format readable by the Jenkins plugin.
+
+
+== Setup/Building
+* `mvn package` to produce a runnable jar (`pipeline-helper-VERSION-shaded.jar`) with all dependencies included in the `target/` directory.
+* `mvn versions:display-dependency-updates versions:display-plugin-updates` to check for updated dependencies.
+
+
+== Contributors
+* Benedikt Fein <fein@fim.uni-passau.de>
+
+
+== License
+Licensed under the EUPL, Version 1.2 or – as soon as they will be approved by
+the European Commission - subsequent versions of the EUPL (the "Licence")
+You may not use this work except in compliance with the Licence. You may obtain
+a  copy of the Licence at: https://joinup.ec.europa.eu/software/page/eupl5
