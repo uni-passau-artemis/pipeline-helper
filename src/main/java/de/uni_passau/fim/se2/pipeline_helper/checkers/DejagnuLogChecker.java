@@ -38,13 +38,38 @@ public class DejagnuLogChecker implements Checker {
 
         final List<String> fileContent = readLogLines();
 
+        final DejagnuLog extractedLog;
+        try {
+            extractedLog = extractLogFromFile(fileContent);
+        } catch (IllegalArgumentException invalidLogException) {
+            throw new CheckerException(String.format("Invalid Dejagnu log file: %s", logFile));
+        }
+
+        final String message = buildCheckerMessage(extractedLog.lines(), extractedLog.hasBeenTerminated());
+        final boolean isSuccessful = !extractedLog.hasFailures() && !extractedLog.hasBeenTerminated();
+
+        return new CheckerResult(testName, isSuccessful, message);
+    }
+
+    private List<String> readLogLines() throws CheckerException {
+        try {
+            return Files.readAllLines(logFile);
+        } catch (IOException e) {
+            throw new CheckerException("Cannot read Dejagnu logfile", e);
+        }
+    }
+
+    private record DejagnuLog(List<String> lines, boolean hasFailures, boolean hasBeenTerminated) {
+    }
+
+    private DejagnuLog extractLogFromFile(final List<String> lines) throws IllegalArgumentException {
         int firstLine = -1;
         int lastLine = -1;
         boolean foundFailures = false;
         boolean hasBeenTerminated = false;
 
-        for (int i = 0; i < fileContent.size(); ++i) {
-            String line = fileContent.get(i);
+        for (int i = 0; i < lines.size(); ++i) {
+            String line = lines.get(i);
             if (line.startsWith("spawn ")) {
                 firstLine = i;
             } else if (line.endsWith(SUMMARY_START_LOG)) {
@@ -57,19 +82,10 @@ public class DejagnuLogChecker implements Checker {
         }
 
         if (firstLine == -1 || lastLine == -1) {
-            throw new CheckerException(String.format("Invalid Dejagnu log file: %s", logFile));
+            throw new IllegalArgumentException(String.format("Invalid Dejagnu log file: %s", logFile));
         }
 
-        String message = buildCheckerMessage(fileContent.subList(firstLine, lastLine), hasBeenTerminated);
-        return new CheckerResult(testName, !foundFailures && !hasBeenTerminated, message);
-    }
-
-    private List<String> readLogLines() throws CheckerException {
-        try {
-            return Files.readAllLines(logFile);
-        } catch (IOException e) {
-            throw new CheckerException("Cannot read Dejagnu logfile", e);
-        }
+        return new DejagnuLog(lines.subList(firstLine, lastLine), foundFailures, hasBeenTerminated);
     }
 
     private String buildCheckerMessage(final List<String> log, boolean hasBeenTerminated) {

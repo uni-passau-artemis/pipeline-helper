@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Checks that all given paths are readable files and are not empty.
  */
 public class FileExistsChecker implements Checker {
-    private final static String CHECKER_NAME = "FileExistsChecker";
+    private static final String CHECKER_NAME = "FileExistsChecker";
 
     private final List<Path> toCheck;
 
@@ -25,37 +25,38 @@ public class FileExistsChecker implements Checker {
 
     @Override
     public CheckerResult check() throws CheckerException {
-        final List<Path> nonExistant = new ArrayList<>();
+        final List<Path> nonExistent = new ArrayList<>();
         final List<Path> emptyFile = new ArrayList<>();
 
         for (final Path p : toCheck) {
             if (!Files.exists(p)) {
-                nonExistant.add(p);
-                continue;
-            }
-
-            if (!Files.isRegularFile(p)) {
-                continue;
-            }
-
-            try {
-                if (Files.readString(p).isBlank()) {
-                    emptyFile.add(p);
-                }
-            } catch (IOException ignored) {
-                // File cannot be read, assumed to be empty
+                nonExistent.add(p);
+            } else if (Files.isRegularFile(p) && isFileEmpty(p)) {
                 emptyFile.add(p);
             }
         }
 
-        final boolean successful = nonExistant.isEmpty() && emptyFile.isEmpty();
+        final boolean successful = nonExistent.isEmpty() && emptyFile.isEmpty();
 
         if (!successful) {
-            final String message = buildFeedbackString(nonExistant, emptyFile);
+            final String message = buildFeedbackString(nonExistent, emptyFile);
             return new CheckerResult(CHECKER_NAME, false, message);
         } else {
             return new CheckerResult(CHECKER_NAME, true);
         }
+    }
+
+    private static boolean isFileEmpty(final Path p) {
+        try {
+            if (Files.readString(p).isBlank()) {
+                return true;
+            }
+        } catch (IOException ignored) {
+            // File cannot be read, assumed to be empty
+            return true;
+        }
+
+        return false;
     }
 
     private String buildFeedbackString(final List<Path> nonExistantFiles, final List<Path> emptyFiles) {

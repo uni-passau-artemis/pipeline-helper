@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  * Checks that all lines in all files have a maximum length.
  */
 public class LineLengthChecker implements Checker {
-    private final static String CHECKER_NAME = "LineLengthChecker";
+    private static final String CHECKER_NAME = "LineLengthChecker";
 
     private final Stream<Path> files;
     private final int maxLength;
@@ -47,9 +47,9 @@ public class LineLengthChecker implements Checker {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Found files with lines longer than %d characters:\n", maxLength));
+        sb.append(String.format("Found files with lines longer than %d characters:%n", maxLength));
         for (var entry : violations.entrySet()) {
-            sb.append(String.format("%s: %d lines\n", entry.getKey(), entry.getValue()));
+            sb.append(String.format("%s: %d lines%n", entry.getKey(), entry.getValue()));
         }
 
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());

@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 public class FilteredFilesStream {
+    private FilteredFilesStream() {}
+
     /**
      * Returns all readable files with the given file extension in the search path.
      *

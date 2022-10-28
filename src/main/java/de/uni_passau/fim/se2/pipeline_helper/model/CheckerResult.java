@@ -49,12 +49,15 @@ public class CheckerResult {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        } else if (o instanceof CheckerResult result) {
+            return successful == result.successful
+                    && name.equals(result.name)
+                    && Objects.equals(message, result.message);
+        } else {
             return false;
-        CheckerResult result = (CheckerResult) o;
-        return successful == result.successful && name.equals(result.name) && Objects.equals(message, result.message);
+        }
     }
 
     @Override

@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * Checks that there is exactly one file with a Java main method
  */
 public class MainMethodChecker implements Checker {
-    private final static String CHECKER_NAME = "MainMethodChecker";
+    private static final String CHECKER_NAME = "MainMethodChecker";
 
     /**
      * Matches Java main methods.
@@ -33,7 +33,7 @@ public class MainMethodChecker implements Checker {
      * <p>
      * Might yield wrong results when a matching String literal is in the code.
      */
-    private final Pattern MAIN_METHOD = Pattern.compile(
+    private static final Pattern MAIN_METHOD = Pattern.compile(
             "^\\s*(?!//|\\*).*public\\s+static\\s+void\\s+main\\((java\\.lang\\.)?String(\\[]|\\.\\.\\.)\\s+[a-zA-Z]\\w*\\)\\s*(throws\\s+.+)?\\{$",
             Pattern.MULTILINE);
 

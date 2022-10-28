@@ -39,6 +39,11 @@ public final class Main implements Runnable {
 
     Path outputDirectory;
 
+    /**
+     * Sets the output directory according to the CLI parameter.
+     *
+     * @param value The output directory.
+     */
     @Option(
             names = { "-o", "--output-directory" },
             defaultValue = "customFeedbacks",

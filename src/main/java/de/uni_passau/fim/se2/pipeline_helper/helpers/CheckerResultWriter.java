@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class CheckerResultWriter {
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     private CheckerResultWriter() {
     }
@@ -32,7 +32,7 @@ public class CheckerResultWriter {
 
         for (final CheckerResult result : results) {
             final Path outputFile = Path.of(outputDirectory.toString(), String.format("TEST-%s.json", result.getName()));
-            Files.writeString(outputFile, gson.toJson(result));
+            Files.writeString(outputFile, GSON.toJson(result));
         }
     }
 }

@@ -2,6 +2,7 @@ image: docker.io/library/maven:3-eclipse-temurin-17
 
 stages:
   - test
+  - lint
 
 variables:
   JACOCO_CSV_LOCATION: "$CI_PROJECT_DIR/target/site/jacoco/jacoco.csv"
@@ -35,3 +36,15 @@ test:
       junit: target/surefire-reports/TEST-*.xml
     expire_in: 1 week
 
+checkstyle:
+  stage: lint
+  script:
+    - mvn $MAVEN_CLI_OPTS checkstyle:checkstyle
+    - cat target/checkstyle-result.xml | ./scripts/checkstyle_report.sh > checkstyle-report.json
+  cache:
+    <<: *global-cache
+  artifacts:
+    when: always
+    reports:
+      codequality:
+        - checkstyle-report.json
