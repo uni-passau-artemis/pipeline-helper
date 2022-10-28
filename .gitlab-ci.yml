@@ -1,6 +1,7 @@
 image: docker.io/library/maven:3-eclipse-temurin-17
 
 stages:
+  - format
   - test
   - lint
 
@@ -21,6 +22,14 @@ cache: &global-cache
   key: "$CI_COMMIT_REF_NAME"
   paths:
     - .m2/repository
+
+spotless:
+  stage: format
+  script:
+    - mvn $MAVEN_CLI_OPTS spotless:check
+  cache:
+    <<: *global-cache
+  allow_failure: true
 
 test:
   stage: test

@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 public class TestUtil {
+
     private TestUtil() {
         throw new UnsupportedOperationException();
     }

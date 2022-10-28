@@ -1,13 +1,13 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
-import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 
 /**
  * Creates a {@link CheckerResult} from a Dejagnu log file.
@@ -16,6 +16,7 @@ import java.util.List;
  * Detects failed tests and sets the success status in the result accordingly.
  */
 public class DejagnuLogChecker implements Checker {
+
     private static final String SUMMARY_START_LOG = "Summary ===";
     private static final String TERMINATED_LOG = "got a TERM signal, terminated";
 
@@ -41,7 +42,8 @@ public class DejagnuLogChecker implements Checker {
         final DejagnuLog extractedLog;
         try {
             extractedLog = extractLogFromFile(fileContent);
-        } catch (IllegalArgumentException invalidLogException) {
+        }
+        catch (IllegalArgumentException invalidLogException) {
             throw new CheckerException(String.format("Invalid Dejagnu log file: %s", logFile));
         }
 
@@ -54,7 +56,8 @@ public class DejagnuLogChecker implements Checker {
     private List<String> readLogLines() throws CheckerException {
         try {
             return Files.readAllLines(logFile);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new CheckerException("Cannot read Dejagnu logfile", e);
         }
     }
@@ -72,11 +75,14 @@ public class DejagnuLogChecker implements Checker {
             String line = lines.get(i);
             if (line.startsWith("spawn ")) {
                 firstLine = i;
-            } else if (line.endsWith(SUMMARY_START_LOG)) {
+            }
+            else if (line.endsWith(SUMMARY_START_LOG)) {
                 lastLine = i;
-            } else if (line.contains(TERMINATED_LOG)) {
+            }
+            else if (line.contains(TERMINATED_LOG)) {
                 hasBeenTerminated = true;
-            } else if (line.startsWith("# of unexpected failures") || line.startsWith("FAIL:")) {
+            }
+            else if (line.startsWith("# of unexpected failures") || line.startsWith("FAIL:")) {
                 foundFailures = true;
             }
         }

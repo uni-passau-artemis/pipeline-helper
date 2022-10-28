@@ -1,9 +1,5 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
-import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,10 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
+
 /**
  * Checks that all given paths are readable files and are not empty.
  */
 public class FileExistsChecker implements Checker {
+
     private static final String CHECKER_NAME = "FileExistsChecker";
 
     private final List<Path> toCheck;
@@ -31,7 +32,8 @@ public class FileExistsChecker implements Checker {
         for (final Path p : toCheck) {
             if (!Files.exists(p)) {
                 nonExistent.add(p);
-            } else if (Files.isRegularFile(p) && isFileEmpty(p)) {
+            }
+            else if (Files.isRegularFile(p) && isFileEmpty(p)) {
                 emptyFile.add(p);
             }
         }
@@ -41,7 +43,8 @@ public class FileExistsChecker implements Checker {
         if (!successful) {
             final String message = buildFeedbackString(nonExistent, emptyFile);
             return new CheckerResult(CHECKER_NAME, false, message);
-        } else {
+        }
+        else {
             return new CheckerResult(CHECKER_NAME, true);
         }
     }
@@ -51,7 +54,8 @@ public class FileExistsChecker implements Checker {
             if (Files.readString(p).isBlank()) {
                 return true;
             }
-        } catch (IOException ignored) {
+        }
+        catch (IOException ignored) {
             // File cannot be read, assumed to be empty
             return true;
         }
@@ -59,19 +63,29 @@ public class FileExistsChecker implements Checker {
         return false;
     }
 
-    private String buildFeedbackString(final List<Path> nonExistantFiles, final List<Path> emptyFiles) {
+    private String buildFeedbackString(final List<Path> nonExistentFiles, final List<Path> emptyFiles) {
         final StringBuilder sb = new StringBuilder();
 
-        if (!nonExistantFiles.isEmpty()) {
+        if (!nonExistentFiles.isEmpty()) {
             sb.append("Missing files:\n");
-            sb.append(nonExistantFiles.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining("\n")));
+            sb.append(
+                nonExistentFiles.stream()
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .collect(Collectors.joining("\n"))
+            );
         }
         if (!emptyFiles.isEmpty()) {
             if (!sb.isEmpty()) {
                 sb.append("\n\n");
             }
             sb.append("Empty or non-readable files:\n");
-            sb.append(emptyFiles.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining("\n")));
+            sb.append(
+                emptyFiles.stream()
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .collect(Collectors.joining("\n"))
+            );
         }
 
         return sb.toString();

@@ -3,6 +3,7 @@ package de.uni_passau.fim.se2.pipeline_helper.model;
 import java.util.Objects;
 
 public class CheckerResult {
+
     /**
      * Name which will be used in Artemis to identify this result.
      */
@@ -51,11 +52,13 @@ public class CheckerResult {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (o instanceof CheckerResult result) {
+        }
+        else if (o instanceof CheckerResult result) {
             return successful == result.successful
-                    && name.equals(result.name)
-                    && Objects.equals(message, result.message);
-        } else {
+                && name.equals(result.name)
+                && Objects.equals(message, result.message);
+        }
+        else {
             return false;
         }
     }
@@ -68,6 +71,6 @@ public class CheckerResult {
     @Override
     public String toString() {
         return "CheckerResult{" + "checkerName='" + name + '\'' + ", successful=" + successful + ", message='" + message
-                + '\'' + '}';
+            + '\'' + '}';
     }
 }

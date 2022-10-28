@@ -1,14 +1,15 @@
 package de.uni_passau.fim.se2.pipeline_helper.helpers;
 
-import com.google.gson.Gson;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.google.gson.Gson;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
+
 public class CheckerResultWriter {
+
     private static final Gson GSON = new Gson();
 
     private CheckerResultWriter() {
@@ -26,12 +27,14 @@ public class CheckerResultWriter {
 
         if (!outputDirectoryExists) {
             Files.createDirectories(outputDirectory);
-        } else if (!Files.isDirectory(outputDirectory)) {
+        }
+        else if (!Files.isDirectory(outputDirectory)) {
             throw new IOException("Output directory already exists but is a file!");
         }
 
         for (final CheckerResult result : results) {
-            final Path outputFile = Path.of(outputDirectory.toString(), String.format("TEST-%s.json", result.getName()));
+            final Path outputFile = Path
+                .of(outputDirectory.toString(), String.format("TEST-%s.json", result.getName()));
             Files.writeString(outputFile, GSON.toJson(result));
         }
     }

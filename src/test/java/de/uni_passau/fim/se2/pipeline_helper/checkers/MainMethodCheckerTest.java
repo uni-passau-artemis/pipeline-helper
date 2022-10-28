@@ -1,15 +1,16 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
-import de.uni_passau.fim.se2.pipeline_helper.helpers.FilteredFilesStream;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
-import org.junit.jupiter.api.Test;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import static com.google.common.truth.Truth.assertThat;
+import org.junit.jupiter.api.Test;
+
+import de.uni_passau.fim.se2.pipeline_helper.helpers.FilteredFilesStream;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 
 class MainMethodCheckerTest {
 
@@ -18,31 +19,31 @@ class MainMethodCheckerTest {
         final MainMethodChecker checker = new MainMethodChecker(Stream.<Path>builder().build());
 
         assertThat(checker.hasMainMethod("""
-                public static void main(String... args) {""")).isTrue();
+            public static void main(String... args) {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(java.lang.String... args) {""")).isTrue();
+            public static void main(java.lang.String... args) {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(java.lang.String... a897345nfDHS) {""")).isTrue();
+            public static void main(java.lang.String... a897345nfDHS) {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(String[] args)
-                {""")).isTrue();
+            public static void main(String[] args)
+            {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                public   static \tvoid
-                main(String...          args){""")).isTrue();
+            public   static \tvoid
+            main(String...          args){""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                package dsad;
-                public static void main(String[] args) {""")).isTrue();
+            package dsad;
+            public static void main(String[] args) {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(String[] args) throws IOException {""")).isTrue();
+            public static void main(String[] args) throws IOException {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(String[] args) throws IOException,RandomException{""")).isTrue();
+            public static void main(String[] args) throws IOException,RandomException{""")).isTrue();
     }
 
     @Test
@@ -50,36 +51,39 @@ class MainMethodCheckerTest {
         final MainMethodChecker checker = new MainMethodChecker(Stream.<Path>builder().build());
 
         assertThat(checker.hasMainMethod("""
-                static void main(String[] args) {""")).isFalse();
+            static void main(String[] args) {""")).isFalse();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(String[] args, int a) {""")).isFalse();
+            public static void main(String[] args, int a) {""")).isFalse();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(Integer s) {""")).isFalse();
+            public static void main(Integer s) {""")).isFalse();
 
         assertThat(checker.hasMainMethod("""
-                public static void main(java.lang.String... 897345nfDHS) {""")).isFalse();
+            public static void main(java.lang.String... 897345nfDHS) {""")).isFalse();
 
         // not in comments
         assertThat(checker.hasMainMethod("""
-                // public static void main(String[] args) {""")).isFalse();
+            // public static void main(String[] args) {""")).isFalse();
         assertThat(checker.hasMainMethod("""
-                // 6\t public static void main(String[] args) {""")).isFalse();
+            // 6\t public static void main(String[] args) {""")).isFalse();
         assertThat(checker.hasMainMethod("""
-                * public static void main(String[] args) {""")).isFalse();
+            * public static void main(String[] args) {""")).isFalse();
         assertThat(checker.hasMainMethod("""
-                *   8rb90   public static void main(String[] args) {""")).isFalse();
+            *   8rb90   public static void main(String[] args) {""")).isFalse();
     }
 
     @Test
     void checkerSingleMainMethod() throws IOException, CheckerException {
         final MainMethodChecker checker = new MainMethodChecker(
-                FilteredFilesStream.files(Path.of("src/main/java/"), "java"));
+            FilteredFilesStream.files(Path.of("src/main/java/"), "java")
+        );
         final CheckerResult result = checker.check();
 
-        final CheckerResult expectedResult = new CheckerResult("MainMethodChecker", true,
-                "Found main method in main.java.de.uni_passau.fim.se2.pipeline_helper.Main");
+        final CheckerResult expectedResult = new CheckerResult(
+            "MainMethodChecker", true,
+            "Found main method in main.java.de.uni_passau.fim.se2.pipeline_helper.Main"
+        );
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -89,22 +93,26 @@ class MainMethodCheckerTest {
         final CheckerResult result = checker.check();
 
         final CheckerResult expectedResult = new CheckerResult("MainMethodChecker", false, """
-                Found multiple files with main methods:
-                test.resources.line_length_checker_demo_files.valid.ValidFile
-                main.java.de.uni_passau.fim.se2.pipeline_helper.Main
-                test.java.de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodCheckerTest
-                test.resources.line_length_checker_demo_files.invalid.InvalidFile""");
+            Found multiple files with main methods:
+            test.resources.line_length_checker_demo_files.valid.ValidFile
+            main.java.de.uni_passau.fim.se2.pipeline_helper.Main
+            test.java.de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodCheckerTest
+            test.resources.line_length_checker_demo_files.invalid.InvalidFile""");
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void checkerNoMainMethods() throws IOException, CheckerException {
-        final MainMethodChecker checker = new MainMethodChecker(FilteredFilesStream
-                .files(Path.of("src/main/java/de/uni_passau/fim/se2/pipeline_helper/checkers"), "java"));
+        final MainMethodChecker checker = new MainMethodChecker(
+            FilteredFilesStream
+                .files(Path.of("src/main/java/de/uni_passau/fim/se2/pipeline_helper/checkers"), "java")
+        );
         final CheckerResult result = checker.check();
 
-        final CheckerResult expectedResult = new CheckerResult("MainMethodChecker", false,
-                "Could not find a main method!");
+        final CheckerResult expectedResult = new CheckerResult(
+            "MainMethodChecker", false,
+            "Could not find a main method!"
+        );
         assertThat(result).isEqualTo(expectedResult);
     }
 

@@ -1,5 +1,14 @@
 package de.uni_passau.fim.se2.pipeline_helper;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.function.Function;
+
 import de.uni_passau.fim.se2.pipeline_helper.checkers.*;
 import de.uni_passau.fim.se2.pipeline_helper.helpers.CheckerResultWriter;
 import de.uni_passau.fim.se2.pipeline_helper.helpers.FilteredFilesStream;
@@ -9,31 +18,23 @@ import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Command(
-        name = "pipeline-helper",
-        version = "1.0.0",
-        mixinStandardHelpOptions = true,
-        description = """
-                Various checkers formerly used in Prakomat ported for integration with Artemis
+    name = "pipeline-helper",
+    version = "1.0.0",
+    mixinStandardHelpOptions = true,
+    description = """
+        Various checkers formerly used in Prakomat ported for integration with Artemis
 
-                Runs any combination of checkers to produce files readable by the Jenkins plugin
-                which then in turn can send this information to Artemis.
-                The DejagnuLogChecker and SimpleMessageWrapper can be specified multiple times
-                with different testNames each time to allow e.g. to parse public, advanced, and
-                secret tests in a single pass.
+        Runs any combination of checkers to produce files readable by the Jenkins plugin
+        which then in turn can send this information to Artemis.
+        The DejagnuLogChecker and SimpleMessageWrapper can be specified multiple times
+        with different testNames each time to allow e.g. to parse public, advanced, and
+        secret tests in a single pass.
 
-                Usage:""")
+        Usage:"""
+)
 public final class Main implements Runnable {
+
     @Spec
     Model.CommandSpec spec;
 
@@ -45,11 +46,11 @@ public final class Main implements Runnable {
      * @param value The output directory.
      */
     @Option(
-            names = { "-o", "--output-directory" },
-            defaultValue = "customFeedbacks",
-            description = """
-                    The directory where the results will be placed.
-                    Default: customFeedbacks"""
+        names = { "-o", "--output-directory" },
+        defaultValue = "customFeedbacks",
+        description = """
+            The directory where the results will be placed.
+            Default: customFeedbacks"""
     )
     public void setOutputDirectory(Path value) {
         if (Files.exists(value) && !Files.isDirectory(value)) {
@@ -59,7 +60,8 @@ public final class Main implements Runnable {
         if (!Files.exists(value)) {
             try {
                 Files.createDirectories(value);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new ParameterException(spec.commandLine(), "Cannot create output directory!");
             }
         }
@@ -68,52 +70,55 @@ public final class Main implements Runnable {
     }
 
     @Option(
-            names = { "-m", "--main-method-checker" },
-            paramLabel = "<searchDirectory>",
-            description = """
-                    Runs the MainMethodChecker.
-                    Parameter: A directory in which a unique Java main method should be searched for."""
+        names = { "-m", "--main-method-checker" },
+        paramLabel = "<searchDirectory>",
+        description = """
+            Runs the MainMethodChecker.
+            Parameter: A directory in which a unique Java main method should be searched for."""
     )
     Path mainMethodCheckerInputDirectory;
 
     @Option(
-            names = { "-e", "--file-exists-checker" },
-            description = """
-                    Runs the FileExistsChecker.
-                    Parameters: A list of files that are checked to exist and be non-empty."""
+        names = { "-e", "--file-exists-checker" },
+        description = """
+            Runs the FileExistsChecker.
+            Parameters: A list of files that are checked to exist and be non-empty."""
     )
     List<Path> fileExistsCheckerFiles;
 
     @Option(
-            names = { "-l", "--line-length-checker" },
-            paramLabel = "<maxLength> <searchDirectory> <extension>",
-            parameterConsumer = LineLengthCheckerArgsConverter.class,
-            description = """
-                    Runs the LineLengthChecker.
-                    Paramters:
-                    - maxLength: maximum allowed line length
-                    -searchDir: directory to look for files in
-                    - extension: a file extension to filter the files on (optional, default: java)"""
+        names = { "-l", "--line-length-checker" },
+        paramLabel = "<maxLength> <searchDirectory> <extension>",
+        parameterConsumer = LineLengthCheckerArgsConverter.class,
+        description = """
+            Runs the LineLengthChecker.
+            Parameters:
+            - maxLength: maximum allowed line length
+            - searchDir: directory to look for files in
+            - extension: a file extension to filter the files on (optional, default: java)"""
     )
     LineLengthChecker lineLengthChecker;
 
     @Option(
-            names = { "-d", "--dejagnu-log-checker" },
-            paramLabel = "<testName> <logFile>",
-            parameterConsumer = DejagnuLogCheckerArgsConverter.class,
-            description = """
-                    Runs a DejagnuLogChecker.
-                    Parameters:
-                    - testName: name of the resulting test case
-                    - logFile: the Dejagnu log file to check"""
+        names = { "-d", "--dejagnu-log-checker" },
+        paramLabel = "<testName> <logFile>",
+        parameterConsumer = DejagnuLogCheckerArgsConverter.class,
+        description = """
+            Runs a DejagnuLogChecker.
+            Parameters:
+            - testName: name of the resulting test case
+            - logFile: the Dejagnu log file to check"""
     )
     List<DejagnuLogChecker> dejagnuLogCheckerArgs = new ArrayList<>();
 
     static class DejagnuLogCheckerArgsConverter implements IParameterConsumer {
+
         @Override
         public void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, Model.CommandSpec commandSpec) {
             if (args.size() < 2) {
-                throw new ParameterException(commandSpec.commandLine(), "The dejagnu log file converter needs two arguments!");
+                throw new ParameterException(
+                    commandSpec.commandLine(), "The dejagnu log file converter needs two arguments!"
+                );
             }
             String testName = args.pop();
             Path logFile = Path.of(args.pop());
@@ -122,33 +127,40 @@ public final class Main implements Runnable {
     }
 
     @Option(
-            names = { "-s", "--simple-message-wrapper" },
-            paramLabel = "<testName> <successful> <message>",
-            parameterConsumer = SimpleMessageArgsConverter.class,
-            description = """
-                    Runs a SimpleMessageWrapping Checker.
-                    Parameters:
-                    - testName: name of the resulting test case
-                    - successful: if the test case should be marked as success or failed
-                    - message: the message shown to students"""
+        names = { "-s", "--simple-message-wrapper" },
+        paramLabel = "<testName> <successful> <message>",
+        parameterConsumer = SimpleMessageArgsConverter.class,
+        description = """
+            Runs a SimpleMessageWrapping Checker.
+            Parameters:
+            - testName: name of the resulting test case
+            - successful: if the test case should be marked as success or failed
+            - message: the message shown to students"""
     )
     List<SimpleMessageChecker> simpleMessageCheckers = new ArrayList<>();
 
     static class SimpleMessageArgsConverter implements IParameterConsumer {
+
         @Override
         public void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, Model.CommandSpec commandSpec) {
             if (args.size() < 3) {
-                throw new ParameterException(commandSpec.commandLine(), "The simple message converter needs three arguments!");
+                throw new ParameterException(
+                    commandSpec.commandLine(), "The simple message converter needs three arguments!"
+                );
             }
-            ((List<SimpleMessageChecker>) argSpec.getValue()).add(new SimpleMessageChecker(args.pop(), Boolean.parseBoolean(args.pop()), args.pop()));
+            ((List<SimpleMessageChecker>) argSpec.getValue())
+                .add(new SimpleMessageChecker(args.pop(), Boolean.parseBoolean(args.pop()), args.pop()));
         }
     }
 
     static class LineLengthCheckerArgsConverter implements IParameterConsumer {
+
         @Override
         public void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, Model.CommandSpec commandSpec) {
             if (args.size() < 2) {
-                throw new ParameterException(commandSpec.commandLine(), "The line length checker needs at least two arguments!");
+                throw new ParameterException(
+                    commandSpec.commandLine(), "The line length checker needs at least two arguments!"
+                );
             }
 
             Path fileSearchPath = Path.of(args.pop());
@@ -156,12 +168,16 @@ public final class Main implements Runnable {
             String extension;
             if (args.empty()) {
                 extension = "java";
-            } else {
+            }
+            else {
                 extension = args.pop();
             }
             try {
-                argSpec.setValue(new LineLengthChecker(FilteredFilesStream.files(fileSearchPath, extension), maxLineLength));
-            } catch (IOException e) {
+                argSpec.setValue(
+                    new LineLengthChecker(FilteredFilesStream.files(fileSearchPath, extension), maxLineLength)
+                );
+            }
+            catch (IOException e) {
                 System.err.printf("Cannot access file needed for LineLengthChecker: %s\n", e.getMessage());
                 System.exit(1);
             }
@@ -177,7 +193,8 @@ public final class Main implements Runnable {
         if (mainMethodCheckerInputDirectory != null) {
             try {
                 checkers.add(new MainMethodChecker(FilteredFilesStream.files(mainMethodCheckerInputDirectory, "java")));
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 System.err.printf("Cannot access file needed for MainMethodChecker: %s\n", e.getMessage());
                 System.exit(1);
             }
@@ -197,25 +214,28 @@ public final class Main implements Runnable {
         final List<Checker> checkers = constructCheckerList();
 
         final List<CheckerResult> results = checkers.stream()
-                .map((Function<Checker, Optional<CheckerResult>>) checker -> {
-                    try {
-                        return Optional.of(checker.check());
-                    } catch (CheckerException e) {
-                        e.printStackTrace();
-                        return Optional.empty();
-                    }
-                })
-                .filter(Optional::isPresent).map(Optional::get)
-                .collect(Collectors.toList());
+            .map((Function<Checker, Optional<CheckerResult>>) checker -> {
+                try {
+                    return Optional.of(checker.check());
+                }
+                catch (CheckerException e) {
+                    e.printStackTrace();
+                    return Optional.empty();
+                }
+            })
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
 
         try {
             CheckerResultWriter.writeFeedback(outputDirectory, results);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-        System.out.printf("Successfully produced %d checker results!\n", checkers.size());
+        System.out.printf("Successfully produced %d checker results!%n", checkers.size());
     }
 
     public static void main(String[] args) {

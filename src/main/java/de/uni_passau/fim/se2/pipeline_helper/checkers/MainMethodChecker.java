@@ -1,9 +1,5 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
-import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
-import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,10 +11,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
+import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
+
 /**
  * Checks that there is exactly one file with a Java main method
  */
 public class MainMethodChecker implements Checker {
+
     private static final String CHECKER_NAME = "MainMethodChecker";
 
     /**
@@ -34,8 +35,9 @@ public class MainMethodChecker implements Checker {
      * Might yield wrong results when a matching String literal is in the code.
      */
     private static final Pattern MAIN_METHOD = Pattern.compile(
-            "^\\s*(?!//|\\*).*public\\s+static\\s+void\\s+main\\((java\\.lang\\.)?String(\\[]|\\.\\.\\.)\\s+[a-zA-Z]\\w*\\)\\s*(throws\\s+.+)?\\{$",
-            Pattern.MULTILINE);
+        "^\\s*(?!//|\\*).*public\\s+static\\s+void\\s+main\\((java\\.lang\\.)?String(\\[]|\\.\\.\\.)\\s+[a-zA-Z]\\w*\\)\\s*(throws\\s+.+)?\\{$",
+        Pattern.MULTILINE
+    );
 
     private final Stream<Path> files;
 
@@ -52,13 +54,14 @@ public class MainMethodChecker implements Checker {
     public CheckerResult check() throws CheckerException {
         final Set<Path> filesWithMainMethods = new HashSet<>();
 
-        for (Iterator<Path> it = files.iterator(); it.hasNext(); ) {
+        for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
             try {
                 if (hasMainMethod(Files.readString(p))) {
                     filesWithMainMethods.add(p);
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new CheckerException("Cannot read file " + p, e);
             }
         }
@@ -67,17 +70,25 @@ public class MainMethodChecker implements Checker {
 
         if (filesWithMainMethods.isEmpty()) {
             result = new CheckerResult(CHECKER_NAME, false, "Could not find a main method!");
-        } else if (filesWithMainMethods.size() == 1) {
-            final String mainClass = asClassPath(filesWithMainMethods.stream().findFirst().get());
+        }
+        else if (filesWithMainMethods.size() == 1) {
+            final String mainClass = asClassPath(filesWithMainMethods.stream().findFirst().orElseThrow());
             System.out.println(mainClass);
-            result = new CheckerResult(CHECKER_NAME, true,
-                    String.format("Found main method in %s", mainClass));
-        } else {
-            final String files = filesWithMainMethods.stream()
-                    .map(this::asClassPath)
-                    .collect(Collectors.joining("\n"));
-            result = new CheckerResult(CHECKER_NAME, false,
-                    String.format("Found multiple files with main methods:\n%s", files));
+            result = new CheckerResult(
+                CHECKER_NAME,
+                true,
+                String.format("Found main method in %s", mainClass)
+            );
+        }
+        else {
+            final String filesWithMainMethod = filesWithMainMethods.stream()
+                .map(this::asClassPath)
+                .collect(Collectors.joining("\n"));
+            result = new CheckerResult(
+                CHECKER_NAME,
+                false,
+                String.format("Found multiple files with main methods:%n%s", filesWithMainMethod)
+            );
         }
 
         return result;
@@ -100,9 +111,9 @@ public class MainMethodChecker implements Checker {
      */
     private String asClassPath(final Path mainClassFile) {
         return mainClassFile.toAbsolutePath()
-                .toString()
-                .replaceAll("^.*/src/", "")
-                .replaceAll("\\.java$", "")
-                .replace('/', '.');
+            .toString()
+            .replaceAll("^.*/src/", "")
+            .replaceAll("\\.java$", "")
+            .replace('/', '.');
     }
 }
