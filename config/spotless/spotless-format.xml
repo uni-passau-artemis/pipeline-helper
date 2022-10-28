@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!--
+SPDX-FileCopyrightText: 2022 Pipeline Helper Contributors
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 <profiles version="21">
     <profile kind="CodeFormatterProfile" name="Spotless Code Style" version="21">
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_ellipsis" value="insert"/>

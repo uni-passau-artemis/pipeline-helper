@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Pipeline Helper Contributors
+//
+// SPDX-License-Identifier: EUPL-1.2
+
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
 import java.io.IOException;
@@ -12,8 +16,8 @@ import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 /**
  * Creates a {@link CheckerResult} from a Dejagnu log file.
  * <p>
- * Trims down the log file to only relevant parts.
- * Detects failed tests and sets the success status in the result accordingly.
+ * Trims down the log file to only relevant parts. Detects failed tests and sets the success status in the result
+ * accordingly.
  */
 public class DejagnuLogChecker implements Checker {
 

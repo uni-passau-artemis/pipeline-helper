@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Pipeline Helper Contributors
+#
+# SPDX-License-Identifier: EUPL-1.2
+
 image: docker.io/library/maven:3-eclipse-temurin-17
 
 stages:
@@ -57,3 +61,11 @@ checkstyle:
     reports:
       codequality:
         - checkstyle-report.json
+
+reuse:
+  stage: lint
+  image:
+    name: docker.io/fsfe/reuse
+    entrypoint: [""]
+  script:
+    - reuse lint

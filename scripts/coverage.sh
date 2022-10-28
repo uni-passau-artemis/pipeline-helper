@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 
+# SPDX-FileCopyrightText: 2022 Pipeline Helper Contributors
+#
+# SPDX-License-Identifier: EUPL-1.2
+
 awk -F"," '{
         instructions += $4 + $5;
         covered += $5;
