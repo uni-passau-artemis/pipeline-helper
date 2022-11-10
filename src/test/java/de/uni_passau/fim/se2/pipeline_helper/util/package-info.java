@@ -2,8 +2,4 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-open module pipeline.helper.main {
-
-    requires info.picocli;
-    requires com.google.gson;
-}
+package de.uni_passau.fim.se2.pipeline_helper.util;

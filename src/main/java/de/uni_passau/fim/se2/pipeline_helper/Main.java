@@ -103,6 +103,39 @@ public final class Main implements Runnable {
     )
     LineLengthChecker lineLengthChecker;
 
+    static class LineLengthCheckerArgsConverter implements IParameterConsumer {
+
+        @Override
+        public void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, Model.CommandSpec commandSpec) {
+            if (args.size() < 2) {
+                throw new ParameterException(
+                    commandSpec.commandLine(), "The line length checker needs at least two arguments!"
+                );
+            }
+
+            int maxLineLength = Integer.parseInt(args.pop());
+            Path fileSearchPath = Path.of(args.pop());
+
+            String extension;
+            if (args.empty()) {
+                extension = "java";
+            }
+            else {
+                extension = args.pop();
+            }
+
+            try {
+                argSpec.setValue(
+                    new LineLengthChecker(FilteredFilesStream.files(fileSearchPath, extension), maxLineLength)
+                );
+            }
+            catch (IOException e) {
+                System.err.printf("Cannot access file needed for LineLengthChecker: %s\n", e.getMessage());
+                System.exit(1);
+            }
+        }
+    }
+
     @Option(
         names = { "-d", "--dejagnu-log-checker" },
         paramLabel = "<testName> <logFile>",
@@ -154,37 +187,6 @@ public final class Main implements Runnable {
             }
             ((List<SimpleMessageChecker>) argSpec.getValue())
                 .add(new SimpleMessageChecker(args.pop(), Boolean.parseBoolean(args.pop()), args.pop()));
-        }
-    }
-
-    static class LineLengthCheckerArgsConverter implements IParameterConsumer {
-
-        @Override
-        public void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, Model.CommandSpec commandSpec) {
-            if (args.size() < 2) {
-                throw new ParameterException(
-                    commandSpec.commandLine(), "The line length checker needs at least two arguments!"
-                );
-            }
-
-            Path fileSearchPath = Path.of(args.pop());
-            int maxLineLength = Integer.parseInt(args.pop());
-            String extension;
-            if (args.empty()) {
-                extension = "java";
-            }
-            else {
-                extension = args.pop();
-            }
-            try {
-                argSpec.setValue(
-                    new LineLengthChecker(FilteredFilesStream.files(fileSearchPath, extension), maxLineLength)
-                );
-            }
-            catch (IOException e) {
-                System.err.printf("Cannot access file needed for LineLengthChecker: %s\n", e.getMessage());
-                System.exit(1);
-            }
         }
     }
 

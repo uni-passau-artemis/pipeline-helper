@@ -69,3 +69,4 @@ reuse:
     entrypoint: [""]
   script:
     - reuse lint
+  cache: []
