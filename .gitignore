@@ -233,3 +233,6 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/java,maven,gradle,intellij+all,eclipse
+
+!src/test/resources/dejagnu_logs/*.log
+

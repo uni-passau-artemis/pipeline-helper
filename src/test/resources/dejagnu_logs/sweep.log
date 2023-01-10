@@ -1,0 +1,71 @@
+Test run by jenkins on Tue Jan 10 13:25:07 2023
+Native configuration is x86_64-pc-linux-gnu
+/usr/share/dejagnu/libexec/config.guess: 1049: objdump: not found
+
+		=== sweep tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+Using ./config/default.exp as tool-and-target-specific interface file.
+Running ./sweep.tests/public.exp ...
+spawn bash ../javat -cp ../target/classes sweep.Shell
+Tue Jan 10 13:25:07 UTC 2023
+A  1.0 10.0   8.0 10.0
+B  4.0  5.0   4.0  9.0
+C  2.0  0.0   2.0  7.0
+D  3.0  2.0   3.0 13.0
+E  6.0  1.0   6.0 12.0
+F  0.0  6.0   0.0 15.0
+G  5.0  3.0  10.0  3.0
+H  7.0  8.0   7.0 14.0
+I  9.0  4.0   9.0 11.0
+X  0.0  0.0  0.0  0.0
+G E # (x=6.0, y=3.0)
+A D # (x=3.0, y=10.0)
+A E # (x=6.0, y=10.0)
+A H # (x=7.0, y=10.0)
+Tue Jan 10 13:25:09 UTC 2023
+[your program terminated]
+PASS: OK
+spawn bash ../javat -cp ../target/classes sweep.Shell
+Tue Jan 10 13:25:09 UTC 2023
+B  4.0  5.0   4.0  9.0
+C  2.0  0.0   2.0  7.0
+D  3.0  2.0   3.0 13.0
+E  6.0  1.0   6.0 12.0
+F  0.0  6.0   0.0 15.0
+G  5.0  3.0  10.0  3.0
+H  7.0  8.0   7.0 14.0
+I  9.0  4.0   9.0 11.0
+X  0.0  0.0  0.0  0.0
+G E # (x=6.0, y=3.0)
+Tue Jan 10 13:25:12 UTC 2023
+[your program terminated]
+PASS: OK
+spawn bash ../javat -cp ../target/classes sweep.Shell
+Tue Jan 10 13:25:12 UTC 2023
+A  1.0 10.0   8.0 10.0
+B  4.0  5.0   4.0  9.0
+C  2.0  0.0   2.0  7.0
+D  3.0  2.0   3.0 13.0
+E  6.0  1.0   6.0 12.0
+F  0.0  6.0   0.0 15.0
+G  5.0  3.0  10.0  3.0
+I  9.0  4.0   9.0 11.0
+X  0.0  0.0  0.0  0.0
+G E # (x=6.0, y=3.0)
+A D # (x=3.0, y=10.0)
+A E # (x=6.0, y=10.0)
+Tue Jan 10 13:25:14 UTC 2023
+[your program terminated]
+PASS: OK
+testcase ./sweep.tests/public.exp completed in 7 seconds
+
+		=== sweep Summary ===
+
+# of expected passes		3
+runtest completed at Tue Jan 10 13:25:14 2023
