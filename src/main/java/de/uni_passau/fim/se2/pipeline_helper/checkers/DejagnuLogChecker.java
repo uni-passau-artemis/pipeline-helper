@@ -76,8 +76,9 @@ public class DejagnuLogChecker implements Checker {
         boolean hasBeenTerminated = false;
 
         for (int i = 0; i < lines.size(); ++i) {
-            String line = lines.get(i);
-            if (line.startsWith("spawn ")) {
+            final String line = lines.get(i);
+            // log starts with first program start
+            if (line.startsWith("spawn ") && firstLine == -1) {
                 firstLine = i;
             }
             else if (line.endsWith(SUMMARY_START_LOG)) {

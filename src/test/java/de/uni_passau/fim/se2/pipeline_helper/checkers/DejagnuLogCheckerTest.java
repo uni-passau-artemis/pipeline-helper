@@ -5,6 +5,7 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static de.uni_passau.fim.se2.pipeline_helper.TestUtil.resource;
 
 import java.nio.file.Path;
@@ -95,5 +96,17 @@ class DejagnuLogCheckerTest {
                 gcd> Running ./gcd.tests/public.exp ...
                 got a TERM signal, terminated"""
         );
+    }
+
+    @Test
+    void shouldParseFullSplaySweepLog() throws Exception {
+        final DejagnuLogChecker checker = new DejagnuLogChecker(resource("dejagnu_logs/sweep.log"), "sweep");
+        final CheckerResult result = checker.check();
+
+        assertThat(result.getName()).isEqualTo("sweep");
+        assertThat(result.isSuccessful()).isTrue();
+        assertWithMessage("Expecting full log, got:\n%s", result.getMessage())
+                .that(result.getMessage().lines().count())
+                .isEqualTo(52);
     }
 }
