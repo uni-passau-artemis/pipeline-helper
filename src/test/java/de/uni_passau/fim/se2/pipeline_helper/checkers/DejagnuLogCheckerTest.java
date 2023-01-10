@@ -106,7 +106,7 @@ class DejagnuLogCheckerTest {
         assertThat(result.getName()).isEqualTo("sweep");
         assertThat(result.isSuccessful()).isTrue();
         assertWithMessage("Expecting full log, got:\n%s", result.getMessage())
-                .that(result.getMessage().lines().count())
-                .isEqualTo(52);
+            .that(result.getMessage().lines().count())
+            .isEqualTo(52);
     }
 }
