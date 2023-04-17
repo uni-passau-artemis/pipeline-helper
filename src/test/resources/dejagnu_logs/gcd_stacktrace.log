@@ -1,0 +1,40 @@
+Native configuration is x86_64-pc-linux-gnu
+
+		=== gcd tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+Using ./config/default.exp as tool-and-target-specific interface file.
+spawn java -cp ../target/classes gcd.Shell
+gcd> Running ./gcd.tests/public.exp ...
+4 5
+gcd(4, 5) = 1
+Exception SomeException
+	at SomeLocation (34)
+	at SomeOtherLocation (12)
+gcd> FAIL: 4 5 (expected "gcd(4, 5) = 1")
+91 21
+gcd(91, 21) = 7
+gcd> PASS: 91 21
+960 18
+gcd(960, 18) = 6
+gcd> PASS: 960 18
+1023 1
+gcd(1023, 1) = 1
+gcd> PASS: 1023 1
+9 0
+gcd(9, 0) = 9
+gcd> PASS: 9 0
+9
+Error! Input is unequal to two numbers.
+gcd> PASS: 9
+testcase ./gcd.tests/public.exp completed in 0 seconds
+
+ 		=== gcd Summary ===
+
+# of expected passes		7
+runtest completed at Tue Dec  1 15:23:51 2020

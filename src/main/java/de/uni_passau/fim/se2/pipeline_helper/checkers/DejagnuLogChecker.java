@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
 import de.uni_passau.fim.se2.pipeline_helper.model.CheckerException;
@@ -104,9 +105,21 @@ public class DejagnuLogChecker implements Checker {
         if (hasBeenTerminated) {
             message += TIMEOUT_MESSAGE + "\n";
         }
-        message += String.join("\n", log);
+        message += log.stream().map(this::processLogLine).collect(Collectors.joining("\n"));
 
         return message.trim();
+    }
+
+    private String processLogLine(final String logLine) {
+        String processed = logLine;
+
+        // Artemis postprocessing would otherwise remove stacktrace and
+        // everything following it by matching the start of the line
+        if (logLine.startsWith("\tat ")) {
+            processed = processed.replaceFirst("\tat ", "    at ");
+        }
+
+        return processed;
     }
 
     private CheckerResult generateResultMissingFile() throws CheckerException {

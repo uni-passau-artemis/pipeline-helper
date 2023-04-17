@@ -109,4 +109,15 @@ class DejagnuLogCheckerTest {
             .that(result.getMessage().lines().count())
             .isEqualTo(52);
     }
+
+    @Test
+    void shouldReplaceStackTraceTabs() throws Exception {
+        final DejagnuLogChecker checker = new DejagnuLogChecker(resource("dejagnu_logs/gcd_stacktrace.log"), "gcd");
+        final CheckerResult result = checker.check();
+
+        assertThat(result.getName()).isEqualTo("gcd");
+        assertThat(result.isSuccessful()).isTrue();
+        assertThat(result.getMessage()).contains("    at ");
+        assertThat(result.getMessage()).doesNotContain("\tat ");
+    }
 }
