@@ -43,7 +43,7 @@ class MainMethodCheckerTest {
 
         assertThat(checker.hasMainMethod("""
             public static void main(String [] args) throws IOException
-            	{""")).isTrue();
+             {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
             public   static \tvoid
