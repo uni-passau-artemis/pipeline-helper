@@ -42,6 +42,10 @@ class MainMethodCheckerTest {
             {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
+            public static void main(String [] args) throws IOException
+            	{""")).isTrue();
+
+        assertThat(checker.hasMainMethod("""
             public   static \tvoid
             main(String...          args){""")).isTrue();
 

@@ -39,7 +39,7 @@ public class MainMethodChecker implements Checker {
      * Might yield wrong results when a matching String literal is in the code.
      */
     private static final Pattern MAIN_METHOD = Pattern.compile(
-        "^\\s*(?!//|\\*).*public\\s+static\\s+void\\s+main\\((java\\.lang\\.)?String\\s*(\\[]|\\.\\.\\.)\\s+[a-zA-Z]\\w*\\)\\s*(throws\\s+.+)?\\{$",
+        "^\\s*(?!//|\\*).*public\\s+static\\s+void\\s+main\\((java\\.lang\\.)?String\\s*(\\[]|\\.\\.\\.)\\s+[a-zA-Z]\\w*\\)\\s*(throws\\s+.+)?\\s*\\{$",
         Pattern.MULTILINE
     );
 
