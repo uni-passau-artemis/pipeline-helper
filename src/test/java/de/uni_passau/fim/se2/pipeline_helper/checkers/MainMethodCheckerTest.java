@@ -26,6 +26,12 @@ class MainMethodCheckerTest {
             public static void main(String... args) {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
+            public static void main(String  ... args) {""")).isTrue();
+
+        assertThat(checker.hasMainMethod("""
+            public static void main(String [] args) {""")).isTrue();
+
+        assertThat(checker.hasMainMethod("""
             public static void main(java.lang.String... args) {""")).isTrue();
 
         assertThat(checker.hasMainMethod("""
