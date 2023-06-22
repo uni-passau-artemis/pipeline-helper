@@ -27,12 +27,12 @@ class SimpleMessageCheckerTest {
         final CheckerException e = assertThrows(
             CheckerException.class, () -> new SimpleMessageChecker("someName", false, null).check()
         );
-        assertThat(e).hasMessageThat().contains("Feedback for non-successful checkes cannot be null or empty!");
+        assertThat(e).hasMessageThat().contains("Feedback for non-successful checks cannot be null or empty!");
 
         final CheckerException e2 = assertThrows(
             CheckerException.class, () -> new SimpleMessageChecker("someName", false, "\t\n   ").check()
         );
-        assertThat(e2).hasMessageThat().contains("Feedback for non-successful checkes cannot be null or empty!");
+        assertThat(e2).hasMessageThat().contains("Feedback for non-successful checks cannot be null or empty!");
     }
 
     @Test

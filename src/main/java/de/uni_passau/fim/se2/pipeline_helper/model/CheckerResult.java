@@ -8,6 +8,8 @@ import java.util.Objects;
 
 public class CheckerResult {
 
+    private static final int MAX_MESSAGE_LENGTH = 10_000_000;
+
     /**
      * Name which will be used in Artemis to identify this result.
      */
@@ -32,12 +34,21 @@ public class CheckerResult {
             throw new CheckerException("CheckerName cannot be null or empty!");
         }
         if (!successful && (message == null || message.isBlank())) {
-            throw new CheckerException("Feedback for non-successful checkes cannot be null or empty!");
+            throw new CheckerException("Feedback for non-successful checks cannot be null or empty!");
         }
 
         this.name = name;
         this.successful = successful;
-        this.message = message;
+
+        if (isLongMessage(message)) {
+            this.message = message.substring(0, MAX_MESSAGE_LENGTH);
+        } else {
+            this.message = message;
+        }
+    }
+
+    private static boolean isLongMessage(final String message) {
+        return message != null && message.length() > MAX_MESSAGE_LENGTH;
     }
 
     public String getName() {
