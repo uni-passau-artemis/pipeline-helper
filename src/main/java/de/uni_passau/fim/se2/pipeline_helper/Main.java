@@ -24,7 +24,7 @@ import picocli.CommandLine.*;
 
 @Command(
     name = "pipeline-helper",
-    version = "1.1.3",
+    version = "1.1.4",
     mixinStandardHelpOptions = true,
     description = """
         Various checkers formerly used in Prakomat ported for integration with Artemis

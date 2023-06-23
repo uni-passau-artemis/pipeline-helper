@@ -42,7 +42,8 @@ public class CheckerResult {
 
         if (isLongMessage(message)) {
             this.message = message.substring(0, MAX_MESSAGE_LENGTH);
-        } else {
+        }
+        else {
             this.message = message;
         }
     }
