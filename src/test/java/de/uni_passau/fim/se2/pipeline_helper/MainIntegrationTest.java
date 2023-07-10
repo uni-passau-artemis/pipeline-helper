@@ -24,28 +24,41 @@ class MainIntegrationTest extends IOTest {
 
     @Test
     void testLineLengthCheckerThreeArgs(@TempDir Path outputDir) {
-        commandLine.execute("-o", outputDir.toString(), "-l", "80", "src/", "java");
-        assertOutputContains("Successfully produced 1 checker results!");
+        commandLine.execute("-o", outputDir.toString(), "line-length", "-l", "80", "-s", "src/", "-e", "java");
+        assertOutputContains("Successfully produced a checker result.");
         assertCheckerResultCreated(outputDir.resolve(LINE_LENGTH_CHECKER_RESULT_FILE));
     }
 
     @Test
     void testLineLengthCheckerTwoArgs(@TempDir Path outputDir) {
-        commandLine.execute("-o", outputDir.toString(), "-l", "80", "src/");
-        assertOutputContains("Successfully produced 1 checker results!");
+        commandLine.execute("-o", outputDir.toString(), "line-length", "-l", "80", "-s", "src/");
+        assertOutputContains("Successfully produced a checker result.");
         assertCheckerResultCreated(outputDir.resolve(LINE_LENGTH_CHECKER_RESULT_FILE));
     }
 
     @Test
     void testCustomFeedbackCreator(@TempDir Path outputDir) throws IOException {
-        commandLine.execute("-o", outputDir.toString(), "-s", "simpleMessage", "true", "'Actual message'");
-        assertOutputContains("Successfully produced 1 checker results!");
+        commandLine
+            .execute("-o", outputDir.toString(), "message", "-n", "simpleMessage", "-s", "-m", "'Actual message'");
+        assertOutputContains("Successfully produced a checker result.");
 
         final Path expectedOutputPath = outputDir.resolve(outputDir.resolve("TEST-simpleMessage.json"));
         assertCheckerResultCreated(expectedOutputPath);
         assertCheckerResultContains(expectedOutputPath, """
             {"name":"simpleMessage","successful":true,"message":"\\u0027Actual message\\u0027"}
             """.trim());
+    }
+
+    @Test
+    void testDejagnuFeedback(@TempDir Path outputDir) throws IOException {
+        final Path logFile = Path.of("src/test/resources/dejagnu_logs/gcd.log");
+        commandLine.execute("-o", outputDir.toString(), "dejagnu", "-n", "simple", "-l", logFile.toString());
+        assertOutputContains("Successfully produced a checker result.");
+
+        final Path expectedOutputPath = outputDir.resolve(outputDir.resolve("TEST-simple.json"));
+        assertCheckerResultCreated(expectedOutputPath);
+        assertCheckerResultContains(expectedOutputPath, """
+            "name":"simple","successful":true,"message":"spawn java -cp""");
     }
 
     private void assertCheckerResultCreated(final Path path) {

@@ -19,6 +19,10 @@ public class CheckerResultWriter {
     private CheckerResultWriter() {
     }
 
+    public static void writeFeedback(final Path outputDirectory, final CheckerResult result) throws IOException {
+        writeFeedback(outputDirectory, List.of(result));
+    }
+
     /**
      * Writes the checker results in an Artemis compatible format to the output directory
      *

@@ -43,16 +43,59 @@ SimpleMessageChecker::
   Tries to transform the given parameters directly into a valid `CheckerResult`-file in the format readable by the Jenkins plugin.
 
 
+== Usage
+
+=== Subcommands
+
+[source,bash]
+----
+java -jar pipeline-helper.jar --help
+----
+----
+Usage:
+  -h, --help      Show this help message and exit.
+  -o, --output-directory=<outputDirectory>
+                  The directory where the results will be placed.
+                    Default: customFeedbacks
+  -V, --version   Print version information and exit.
+Commands:
+  dejagnu      Parses a Dejagnu log file and converts it into a result.
+  file-exists  Checks that the files exist and are not empty.
+  line-length  Checks that a set of files only contain lines shorter that a
+                 threshold.
+  main-method  Searches for Java main methods.
+  message      Produces a custom test result message in the required format for
+                 Artemis.
+----
+
+Each subcommand accepts the `--help` command line option as well to show options specific to that command.
+
+.Dejagnu subcommand usage
+[example]
+--
+[source,bash]
+----
+java -jar pipeline-helper.jar dejagnu --help
+----
+----
+Usage: pipeline-helper dejagnu [-hV] -l=<logFile> -n=<testName>
+Parses a Dejagnu log file and converts it into a result.
+  -h, --help              Show this help message and exit.
+  -l, --log=<logFile>     The log file of the Dejagnu run.
+  -n, --name=<testName>   The unique name for the produced result.
+  -V, --version           Print version information and exit.
+----
+--
+
+
 == Setup/Building
+
 * `mvn package` to produce a runnable jar (`pipeline-helper-VERSION-shaded.jar`) with all dependencies included in the `target/` directory.
 * `mvn versions:display-dependency-updates versions:display-plugin-updates` to check for updated dependencies.
 
 
-== Contributors
-* Benedikt Fein <fein@fim.uni-passau.de>
-
-
 == License
+
 Licensed under the EUPL, Version 1.2 or – as soon as they will be approved by
 the European Commission - subsequent versions of the EUPL (the "Licence")
 You may not use this work except in compliance with the Licence. You may obtain
