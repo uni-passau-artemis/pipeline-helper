@@ -161,9 +161,8 @@ public final class Main implements Runnable {
         Path searchPath;
 
         @Override
-        protected Checker buildChecker() throws Exception {
-            final Stream<Path> javaFiles = FilteredFilesStream.files(searchPath, "java");
-            return new MainMethodChecker(javaFiles);
+        protected Checker buildChecker() {
+            return new MainMethodChecker(searchPath);
         }
     }
 

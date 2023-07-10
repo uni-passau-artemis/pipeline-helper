@@ -32,12 +32,12 @@ LineLengthChecker::
   Lists the number of violations per file in the message to the student.
 
 MainMethodChecker::
-  Checks all `*.java` files in the given directory for `main`-methods.
+  Checks all `*.class` files in the given directory for `main`-methods.
   The test succeeds if a unique main method has been found.
   The message to the student contains
-    * if a unique method has been found: the file with it.
+    * if a unique method has been found: the class name.
     * if no `main`-method has been found: an informational message explaining this.
-    * if multiple `main`-methods have been found: the list of files with `main`-methods.
+    * if multiple `main`-methods have been found: the list of classes with `main`-methods.
 
 SimpleMessageChecker::
   Tries to transform the given parameters directly into a valid `CheckerResult`-file in the format readable by the Jenkins plugin.
