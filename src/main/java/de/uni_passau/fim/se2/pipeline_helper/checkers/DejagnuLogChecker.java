@@ -53,7 +53,8 @@ public class DejagnuLogChecker implements Checker {
         }
 
         final String message = buildCheckerMessage(extractedLog.lines(), extractedLog.hasBeenTerminated());
-        final boolean isSuccessful = !extractedLog.hasFailures() && !extractedLog.hasBeenTerminated();
+        final boolean isSuccessful = extractedLog.hasPassingTests() && !extractedLog.hasFailures()
+            && !extractedLog.hasBeenTerminated();
 
         return new CheckerResult(testName, isSuccessful, message);
     }
@@ -67,13 +68,16 @@ public class DejagnuLogChecker implements Checker {
         }
     }
 
-    private record DejagnuLog(List<String> lines, boolean hasFailures, boolean hasBeenTerminated) {
+    private record DejagnuLog(
+        List<String> lines, boolean hasFailures, boolean hasPassingTests, boolean hasBeenTerminated
+    ) {
     }
 
     private DejagnuLog extractLogFromFile(final List<String> lines) throws IllegalArgumentException {
         int firstLine = -1;
         int lastLine = -1;
         boolean foundFailures = false;
+        boolean hasPassingTests = false;
         boolean hasBeenTerminated = false;
 
         for (int i = 0; i < lines.size(); ++i) {
@@ -88,7 +92,10 @@ public class DejagnuLogChecker implements Checker {
             else if (line.contains(TERMINATED_LOG)) {
                 hasBeenTerminated = true;
             }
-            else if (line.startsWith("# of unexpected failures") || line.startsWith("FAIL:")) {
+            else if (line.startsWith("# of expected passes")) {
+                hasPassingTests = true;
+            }
+            else if (containsFailure(line)) {
                 foundFailures = true;
             }
         }
@@ -97,7 +104,7 @@ public class DejagnuLogChecker implements Checker {
             throw new IllegalArgumentException(String.format("Invalid Dejagnu log file: %s", logFile));
         }
 
-        return new DejagnuLog(lines.subList(firstLine, lastLine), foundFailures, hasBeenTerminated);
+        return new DejagnuLog(lines.subList(firstLine, lastLine), foundFailures, hasPassingTests, hasBeenTerminated);
     }
 
     private String buildCheckerMessage(final List<String> log, boolean hasBeenTerminated) {
@@ -124,5 +131,9 @@ public class DejagnuLogChecker implements Checker {
 
     private CheckerResult generateResultMissingFile() throws CheckerException {
         return new CheckerResult(testName, false, FILE_NOT_FOUND_MESSAGE);
+    }
+
+    private boolean containsFailure(String line) {
+        return line.startsWith("# of unexpected failures") || line.startsWith("FAIL:");
     }
 }

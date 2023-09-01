@@ -1,0 +1,28 @@
+Test run by jenkins on Thu May 25 12:08:22 2023
+Native configuration is x86_64-pc-linux-gnu
+/usr/share/dejagnu/libexec/config.guess: 1049: objdump: not found
+
+		=== rev tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+Using ./config/default.exp as tool-and-target-specific interface file.
+spawn java -cp ../target/classes reversi.Shell
+reversi> Running ./rev.tests/advanced.exp ...
+ERROR: (DejaGnu) proc "define(MSG_PLAYER_SKIP, ifdef(V1, `You must miss a turn.', `Human has to miss a turn'))" does not exist.
+The error code is TCL LOOKUP COMMAND define(MSG_PLAYER_SKIP,
+The info on the error is:
+invalid command name "define(MSG_PLAYER_SKIP,"
+    while executing
+"::tcl_unknown define(MSG_PLAYER_SKIP, ifdef(V1, `You must miss a turn.', `Human has to miss a turn'))"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel 1 ::tcl_unknown $args"
+
+		=== rev Summary ===
+
+runtest completed at Thu May 25 12:08:23 2023

@@ -71,6 +71,29 @@ class DejagnuLogCheckerTest {
     }
 
     @Test
+    void shouldRecogniseUnfinishedTestsAsFailingTestRun() throws Exception {
+        final DejagnuLogChecker checker = new DejagnuLogChecker(resource("dejagnu_logs/rev.log"), "rev");
+        final CheckerResult result = checker.check();
+
+        assertThat(result.getName()).isEqualTo("rev");
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).isEqualTo(
+            """
+                spawn java -cp ../target/classes reversi.Shell
+                reversi> Running ./rev.tests/advanced.exp ...
+                ERROR: (DejaGnu) proc "define(MSG_PLAYER_SKIP, ifdef(V1, `You must miss a turn.', `Human has to miss a turn'))" does not exist.
+                The error code is TCL LOOKUP COMMAND define(MSG_PLAYER_SKIP,
+                The info on the error is:
+                invalid command name "define(MSG_PLAYER_SKIP,"
+                    while executing
+                "::tcl_unknown define(MSG_PLAYER_SKIP, ifdef(V1, `You must miss a turn.', `Human has to miss a turn'))"
+                    ("uplevel" body line 1)
+                    invoked from within
+                "uplevel 1 ::tcl_unknown $args\""""
+        );
+    }
+
+    @Test
     void shouldGenerateAReplacementResultIfLogFileNotFound() throws CheckerException {
         final DejagnuLogChecker checker = new DejagnuLogChecker(Path.of("not_existing"), "gcd");
         final CheckerResult result = checker.check();
