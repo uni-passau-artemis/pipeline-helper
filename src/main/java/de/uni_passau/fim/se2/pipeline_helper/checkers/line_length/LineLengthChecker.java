@@ -2,15 +2,13 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package de.uni_passau.fim.se2.pipeline_helper.checkers;
+package de.uni_passau.fim.se2.pipeline_helper.checkers.line_length;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
@@ -31,20 +29,15 @@ public class LineLengthChecker implements Checker {
         this.files = files;
         this.maxLength = maxLength;
     }
-
+    
     @Override
     public CheckerResult check() throws CheckerException {
-        final Map<String, Integer> violations = new HashMap<>();
+        List<FileLineLengthViolations> violations = new ArrayList<>();
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
-            try {
-                final int count = (int) Files.readAllLines(p).stream().filter(l -> l.length() > maxLength).count();
-                if (count > 0) {
-                    violations.put(getPathRelativeToProjectRoot(p).toString(), count);
-                }
-            }
-            catch (IOException e) {
-                throw new CheckerException("Cannot read file " + p, e);
+            final List<Integer> linesWithViolations = getAllLineIndicesWithViolations(p);
+            if (linesWithViolations.size() > 0) {
+                violations.add(new FileLineLengthViolations(p, linesWithViolations.size(), linesWithViolations));
             }
         }
 
@@ -54,18 +47,23 @@ public class LineLengthChecker implements Checker {
 
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Found files with lines longer than %d characters:%n", maxLength));
-        for (var entry : violations.entrySet()) {
-            sb.append(String.format("%s: %d lines%n", entry.getKey(), entry.getValue()));
-        }
+        violations.forEach(sb::append);
 
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
     }
     
-    private Path getPathRelativeToProjectRoot(final Path absolutePathToFile) {
-        // get the path to the project root
-        final Path workingDirPath = Paths.get("").toAbsolutePath();
-        
-        // trim the user specific part of the path including the root folder
-        return workingDirPath.relativize(absolutePathToFile);
+    private List<Integer> getAllLineIndicesWithViolations(Path path) throws CheckerException {
+        List<Integer> lineNumbers = new ArrayList<>();
+        try {
+            final List<String> lines = Files.readAllLines(path);
+            for (int i = 0; i< lines.size(); i++) {
+                if (lines.get(i).length() > maxLength) {
+                    lineNumbers.add(i);
+                }
+            }
+        } catch (IOException e) {
+            throw new CheckerException("Cannot read file " + path, e);
+        }
+        return lineNumbers;
     }
 }

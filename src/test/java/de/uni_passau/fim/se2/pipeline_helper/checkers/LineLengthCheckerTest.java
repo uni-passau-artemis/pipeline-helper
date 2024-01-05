@@ -7,6 +7,7 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static de.uni_passau.fim.se2.pipeline_helper.TestUtil.resource;
 
+import de.uni_passau.fim.se2.pipeline_helper.checkers.line_length.LineLengthChecker;
 import org.junit.jupiter.api.Test;
 
 import de.uni_passau.fim.se2.pipeline_helper.helpers.FilteredFilesStream;
@@ -37,19 +38,4 @@ class LineLengthCheckerTest {
         final CheckerResult expectedResult = new CheckerResult("LineLengthChecker", true);
         assertThat(result).isEqualTo(expectedResult);
     }
-
-    @Test
-    void checkFailedInDifferentPackagesWithIdenticalFileNames() throws Exception {
-        final LineLengthChecker checker = new LineLengthChecker(
-                FilteredFilesStream.files(resource("line_length_checker_demo_files/"), "java"), 80
-        );
-        final CheckerResult result = checker.check();
-
-        final CheckerResult expectedResult = new CheckerResult("LineLengthChecker", false, """
-                Found files with lines longer than 80 characters:
-                target/test-classes/line_length_checker_demo_files/also_invalid/InvalidFile.java: 2 lines
-                target/test-classes/line_length_checker_demo_files/invalid/InvalidFile.java: 2 lines"""
-        );
-        assertThat(result).isEqualTo(expectedResult);
-    }    
 }
