@@ -40,7 +40,7 @@ public class LineLengthChecker implements Checker {
             try {
                 final int count = (int) Files.readAllLines(p).stream().filter(l -> l.length() > maxLength).count();
                 if (count > 0) {
-                    violations.put(getPathRelativeToProjectRoot(p).toString(), count);
+                    violations.put(p.toString(), count);
                 }
             }
             catch (IOException e) {
@@ -59,13 +59,5 @@ public class LineLengthChecker implements Checker {
         }
 
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
-    }
-    
-    private Path getPathRelativeToProjectRoot(final Path absolutePathToFile) {
-        // get the path to the project root
-        final Path workingDirPath = Paths.get("").toAbsolutePath();
-        
-        // trim the user specific part of the path including the root folder
-        return workingDirPath.relativize(absolutePathToFile);
     }
 }
