@@ -21,11 +21,12 @@ class LineLengthCheckerTest {
             FilteredFilesStream.files(resource("line_length_checker_demo_files/"), "java"), 80
         );
         final CheckerResult result = checker.check();
-        
-        final CheckerResult expectedResult = new CheckerResult("LineLengthChecker", false, """
-            Found files with lines longer than 80 characters:
-            target/test-classes/line_length_checker_demo_files/invalid/InvalidFile.java: 2 lines""");
-        assertThat(result).isEqualTo(expectedResult);
+        assertThat(result.getName()).contains("LineLengthChecker");
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).contains(
+                "target/test-classes/line_length_checker_demo_files/invalid/InvalidFile.java: 2 lines");
+        assertThat(result.getMessage()).contains(
+                "target/test-classes/line_length_checker_demo_files/also_invalid/InvalidFile.java: 2 lines");
     }
 
     @Test

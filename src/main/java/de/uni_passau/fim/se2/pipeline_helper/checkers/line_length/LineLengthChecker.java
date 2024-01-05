@@ -7,7 +7,6 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers.line_length;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -29,7 +28,7 @@ public class LineLengthChecker implements Checker {
         this.files = files;
         this.maxLength = maxLength;
     }
-    
+
     @Override
     public CheckerResult check() throws CheckerException {
         List<FileLineLengthViolations> violations = new ArrayList<>();
