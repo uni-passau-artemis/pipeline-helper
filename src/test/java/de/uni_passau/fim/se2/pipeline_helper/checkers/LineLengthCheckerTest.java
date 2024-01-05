@@ -24,9 +24,9 @@ class LineLengthCheckerTest {
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
         assertThat(result.getMessage()).contains(
-                "target/test-classes/line_length_checker_demo_files/invalid/InvalidFile.java: 2 lines");
+                "target/test-classes/line_length_checker_demo_files/invalid/InvalidFile.java, on 2 lines: 6 & 9");
         assertThat(result.getMessage()).contains(
-                "target/test-classes/line_length_checker_demo_files/also_invalid/InvalidFile.java: 2 lines");
+                "target/test-classes/line_length_checker_demo_files/also_invalid/InvalidFile.java, on 2 lines: 6 & 9");
     }
 
     @Test
