@@ -7,6 +7,7 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,13 +35,12 @@ public class LineLengthChecker implements Checker {
     @Override
     public CheckerResult check() throws CheckerException {
         final Map<String, Integer> violations = new HashMap<>();
-
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
             try {
                 final int count = (int) Files.readAllLines(p).stream().filter(l -> l.length() > maxLength).count();
                 if (count > 0) {
-                    violations.put(p.getFileName().toString(), count);
+                    violations.put(getPathRelativeToProjectRoot(p).toString(), count);
                 }
             }
             catch (IOException e) {
@@ -59,5 +59,13 @@ public class LineLengthChecker implements Checker {
         }
 
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
+    }
+    
+    private Path getPathRelativeToProjectRoot(final Path absolutePathToFile) {
+        // get the path to the project root
+        final Path workingDirPath = Paths.get("").toAbsolutePath();
+        
+        // trim the user specific part of the path including the root folder
+        return workingDirPath.relativize(absolutePathToFile);
     }
 }
