@@ -2,14 +2,15 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-name: Continous Integration
+name: Continuous Integration
 
 on:
   pull_request:
   push:
     branches:
       - main
-    tags: 'v[0-9]+.[0-9]+.[0-9]+'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   java: 17
@@ -101,3 +102,44 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Tests
         run: mvn -B test
+
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '${{ env.java }}'
+          distribution: '${{ env.java-distribution }}'
+      - uses: actions/checkout@v3
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Checkstyle
+        run: mvn -B checkstyle:check
+      - name: Fail build if there are Checkstyle violations
+        run: |
+          ! grep -q "^<error" target/checkstyle-result.xml
+
+  code-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '${{ env.java }}'
+          distribution: '${{ env.java-distribution }}'
+      - uses: actions/checkout@v3
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Run `mvn spotless:apply` locally if the following check is failing
+        run: "true"
+      - name: Spotless code formatting
+        run: mvn -B spotless:check
