@@ -26,10 +26,12 @@ public class LineLengthChecker implements Checker {
 
     private final Stream<Path> files;
     private final int maxLength;
+    private final Path directory;
 
-    public LineLengthChecker(final Stream<Path> files, final int maxLength) {
+    public LineLengthChecker(final Stream<Path> files, final int maxLength, final Path directory) {
         this.files = files;
         this.maxLength = maxLength;
+        this.directory = directory;
     }
 
     @Override
@@ -40,7 +42,7 @@ public class LineLengthChecker implements Checker {
             try {
                 final int count = (int) Files.readAllLines(p).stream().filter(l -> l.length() > maxLength).count();
                 if (count > 0) {
-                    violations.put(p.toString(), count);
+                    violations.put(directory.relativize(p).toString(), count);
                 }
             }
             catch (IOException e) {
