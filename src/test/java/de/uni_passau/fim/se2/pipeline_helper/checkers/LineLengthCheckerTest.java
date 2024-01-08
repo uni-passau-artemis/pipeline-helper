@@ -16,7 +16,19 @@ import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 class LineLengthCheckerTest {
 
     @Test
-    void checkFailed() throws Exception {
+    void checkFailedSingleViolation() throws Exception {
+        final LineLengthChecker checker = new LineLengthChecker(
+                FilteredFilesStream.files(resource("line_length_checker_demo_files/"), "java"), 80
+        );
+        final CheckerResult result = checker.check();
+        assertThat(result.getName()).contains("LineLengthChecker");
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).contains(
+                "target/test-classes/line_length_checker_demo_files/invalid/InvalidFileSingleViolation.java, on 1 line: 7");
+    }
+
+    @Test
+    void checkFailedTwoViolations() throws Exception {
         final LineLengthChecker checker = new LineLengthChecker(
             FilteredFilesStream.files(resource("line_length_checker_demo_files/"), "java"), 80
         );
@@ -27,6 +39,18 @@ class LineLengthCheckerTest {
                 "target/test-classes/line_length_checker_demo_files/invalid/InvalidFile.java, on 2 lines: 7 & 10");
         assertThat(result.getMessage()).contains(
                 "target/test-classes/line_length_checker_demo_files/also_invalid/InvalidFile.java, on 2 lines: 7 & 10");
+    }
+
+    @Test
+    void checkFailedMoreThanTwoViolations() throws Exception {
+        final LineLengthChecker checker = new LineLengthChecker(
+                FilteredFilesStream.files(resource("line_length_checker_demo_files/"), "java"), 80
+        );
+        final CheckerResult result = checker.check();
+        assertThat(result.getName()).contains("LineLengthChecker");
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).contains(
+                "target/test-classes/line_length_checker_demo_files/invalid/InvalidFileFourViolations.java, on 4 lines: 7, 8, 9 & 10");
     }
 
     @Test
