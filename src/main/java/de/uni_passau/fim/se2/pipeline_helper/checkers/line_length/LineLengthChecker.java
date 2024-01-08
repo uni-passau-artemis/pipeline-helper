@@ -23,10 +23,12 @@ public class LineLengthChecker implements Checker {
 
     private final Stream<Path> files;
     private final int maxLength;
+    private final Path directory;
 
-    public LineLengthChecker(final Stream<Path> files, final int maxLength) {
+    public LineLengthChecker(final Stream<Path> files, final int maxLength, final Path directory) {
         this.files = files;
         this.maxLength = maxLength;
+        this.directory = directory;
     }
 
     @Override
@@ -36,7 +38,7 @@ public class LineLengthChecker implements Checker {
             final Path p = it.next();
             final List<Integer> linesWithViolations = getAllLineIndicesWithViolations(p);
             if (!linesWithViolations.isEmpty()) {
-                violations.add(new FileLineLengthViolations(p, linesWithViolations.size(), linesWithViolations));
+                violations.add(new FileLineLengthViolations(directory.relativize(p), linesWithViolations.size(), linesWithViolations));
             }
         }
 
