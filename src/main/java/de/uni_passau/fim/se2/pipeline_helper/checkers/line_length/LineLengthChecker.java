@@ -38,11 +38,7 @@ public class LineLengthChecker implements Checker {
             final Path p = it.next();
             final SortedMap<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
             if (!linesWithViolations.isEmpty()) {
-                violations.add(
-                    new FileLineLengthViolations(
-                        directory.relativize(p), linesWithViolations.size(), linesWithViolations
-                    )
-                );
+                violations.add(new FileLineLengthViolations(directory.relativize(p), linesWithViolations));
             }
         }
 
@@ -57,20 +53,30 @@ public class LineLengthChecker implements Checker {
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
     }
 
-    private SortedMap<Integer, Integer> getAllViolationsWithLength(Path path) throws CheckerException {
-        SortedMap<Integer, Integer> violationsWithLength = new TreeMap<>();
-        try {
-            final List<String> lines = Files.readAllLines(path);
-            for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).length() > maxLength) {
-                    // add one, since lines are usually enumerated starting at 1
-                    violationsWithLength.put(i + 1, lines.get(i).length());
-                }
-            }
+    private SortedMap<Integer, Integer> getAllViolationsWithLength(final Path path) throws CheckerException {
+        try (Stream<String> lines = Files.lines(path)) {
+            return getAllViolationWithLength(lines);
         }
         catch (IOException e) {
             throw new CheckerException("Cannot read file " + path, e);
         }
+    }
+
+    private SortedMap<Integer, Integer> getAllViolationWithLength(final Stream<String> fileLines) {
+        final SortedMap<Integer, Integer> violationsWithLength = new TreeMap<>();
+        final Iterator<String> lines = fileLines.sequential().iterator();
+        int lineIdx = 1;
+
+        while (lines.hasNext()) {
+            final String line = lines.next();
+
+            if (line.length() > maxLength) {
+                violationsWithLength.put(lineIdx, line.length());
+            }
+
+            lineIdx += 1;
+        }
+
         return violationsWithLength;
     }
 }
