@@ -25,22 +25,23 @@ public class LineLengthChecker implements Checker {
 
     private final Stream<Path> files;
     private final int maxLength;
+    private final Path directory;
 
-    public LineLengthChecker(final Stream<Path> files, final int maxLength) {
+    public LineLengthChecker(final Path directory, final Stream<Path> files, final int maxLength) {
         this.files = files;
         this.maxLength = maxLength;
+        this.directory = directory;
     }
 
     @Override
     public CheckerResult check() throws CheckerException {
         final Map<String, Integer> violations = new HashMap<>();
-
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
             try {
                 final int count = (int) Files.readAllLines(p).stream().filter(l -> l.length() > maxLength).count();
                 if (count > 0) {
-                    violations.put(p.getFileName().toString(), count);
+                    violations.put(directory.relativize(p).toString(), count);
                 }
             }
             catch (IOException e) {
