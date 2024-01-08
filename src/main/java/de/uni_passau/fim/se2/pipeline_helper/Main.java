@@ -212,7 +212,7 @@ public final class Main implements Runnable {
         @Override
         protected Checker buildChecker() throws Exception {
             final Stream<Path> files = FilteredFilesStream.files(directory, fileExtension);
-            return new LineLengthChecker(files, lineLength, directory);
+            return new LineLengthChecker(directory, files, lineLength);
         }
     }
 

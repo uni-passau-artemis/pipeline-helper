@@ -25,7 +25,7 @@ public class LineLengthChecker implements Checker {
     private final int maxLength;
     private final Path directory;
 
-    public LineLengthChecker(final Stream<Path> files, final int maxLength, final Path directory) {
+    public LineLengthChecker(final Path directory, final Stream<Path> files, final int maxLength) {
         this.files = files;
         this.maxLength = maxLength;
         this.directory = directory;
@@ -33,7 +33,7 @@ public class LineLengthChecker implements Checker {
 
     @Override
     public CheckerResult check() throws CheckerException {
-        List<FileLineLengthViolations> violations = new ArrayList<>();
+        final List<FileLineLengthViolations> violations = new ArrayList<>();
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
             final Map<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
