@@ -7,7 +7,6 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class LineLengthChecker implements Checker {
     private final int maxLength;
     private final Path directory;
 
-    public LineLengthChecker(final Stream<Path> files, final int maxLength, final Path directory) {
+    public LineLengthChecker(final Path directory, final Stream<Path> files, final int maxLength) {
         this.files = files;
         this.maxLength = maxLength;
         this.directory = directory;
