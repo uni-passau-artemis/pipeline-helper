@@ -27,8 +27,9 @@ class LineLengthCheckerTest {
     }
     @Test
     void checkFailedSingleViolation() throws Exception {
-        final LineLengthChecker checker = 
-                new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
+        final LineLengthChecker checker = new LineLengthChecker(
+                dir, FilteredFilesStream.files(dir, "java"), 80
+        );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
@@ -41,8 +42,9 @@ class LineLengthCheckerTest {
 
     @Test
     void checkFailedTwoViolationsDifferentFiles() throws Exception {
-        final LineLengthChecker checker = 
-                new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
+        final LineLengthChecker checker = new LineLengthChecker(
+                dir, FilteredFilesStream.files(dir, "java"), 80
+        );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
@@ -62,8 +64,9 @@ class LineLengthCheckerTest {
 
     @Test
     void checkFailedMoreThanTwoViolations() throws Exception {
-        final LineLengthChecker checker = 
-                new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
+        final LineLengthChecker checker = new LineLengthChecker(
+                dir, FilteredFilesStream.files(dir, "java"), 80
+        );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
@@ -81,7 +84,8 @@ class LineLengthCheckerTest {
     void checkSuccess() throws Exception {
         Path validDir = dir.resolve("valid/");
         final LineLengthChecker checker = new LineLengthChecker(
-                FilteredFilesStream.files(validDir, "java"), 80, validDir);
+                validDir, FilteredFilesStream.files(validDir, "java"), 80
+        );
         final CheckerResult result = checker.check();
         final CheckerResult expectedResult = new CheckerResult("LineLengthChecker", true);
         assertThat(result).isEqualTo(expectedResult);
