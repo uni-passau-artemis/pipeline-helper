@@ -27,7 +27,8 @@ class LineLengthCheckerTest {
     }
     @Test
     void checkFailedSingleViolation() throws Exception {
-        final LineLengthChecker checker = new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
+        final LineLengthChecker checker = 
+                new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
@@ -36,7 +37,8 @@ class LineLengthCheckerTest {
 
     @Test
     void checkFailedTwoViolations() throws Exception {
-        final LineLengthChecker checker = new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
+        final LineLengthChecker checker = 
+                new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
@@ -46,12 +48,12 @@ class LineLengthCheckerTest {
 
     @Test
     void checkFailedMoreThanTwoViolations() throws Exception {
-        final LineLengthChecker checker = new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
+        final LineLengthChecker checker = 
+                new LineLengthChecker(FilteredFilesStream.files(dir, "java"), 80, dir);
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
-        assertThat(result.getMessage()).contains(
-                "target/test-classes/line_length_checker_demo_files/invalid/InvalidFileFourViolations.java, on 4 lines: 7, 8, 9 & 10");
+        assertThat(result.getMessage()).contains("invalid/InvalidFileFourViolations.java, on 4 lines: 7, 8, 9 & 10");
     }
 
     @Test
