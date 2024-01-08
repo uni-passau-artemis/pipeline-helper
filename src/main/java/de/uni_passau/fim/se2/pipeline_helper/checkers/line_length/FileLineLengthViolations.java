@@ -11,15 +11,14 @@ public record FileLineLengthViolations(Path file, int count, List<Integer> lines
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s, on %d lines: ", file.toString(), count));
-        lines.forEach(line -> sb.append(String.format("%d, ", line)));
-        
-        // remove last whitespace and comma
-        sb.replace(sb.length() - 2, sb.length(), "");
-        
-        // replace last comma with '&' for a nicer look
-        sb.replace(sb.length() - 3, sb.length() - 1, " & ");
-        sb.append(String.format("%n"));
+        String lineOrLines = lines.size() > 1 ? "lines" : "line";
+        sb.append(String.format("%s, on %d %s: ", file.toString(), count, lineOrLines));
+        if (lines.size() > 1) {
+            // append all elements with comma, except the last one, which is appended using '&'
+            sb.append(String.join(", ", lines.subList(0, lines.size() - 1).stream().map(Object::toString).toList()));
+            sb.append(" & ");
+        }
+        sb.append(lines.get(lines.size() - 1));
         return sb.toString();
     }
 }

@@ -55,9 +55,10 @@ public class LineLengthChecker implements Checker {
         List<Integer> lineNumbers = new ArrayList<>();
         try {
             final List<String> lines = Files.readAllLines(path);
-            for (int i = 0; i< lines.size(); i++) {
+            for (int i = 0; i < lines.size(); i++) {
                 if (lines.get(i).length() > maxLength) {
-                    lineNumbers.add(i);
+                    // add one, since lines are usually enumerated starting at 1
+                    lineNumbers.add(i + 1);
                 }
             }
         } catch (IOException e) {
