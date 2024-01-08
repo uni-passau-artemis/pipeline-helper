@@ -35,7 +35,7 @@ public class LineLengthChecker implements Checker {
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
             final List<Integer> linesWithViolations = getAllLineIndicesWithViolations(p);
-            if (linesWithViolations.size() > 0) {
+            if (!linesWithViolations.isEmpty()) {
                 violations.add(new FileLineLengthViolations(p, linesWithViolations.size(), linesWithViolations));
             }
         }
