@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package de.uni_passau.fim.se2.pipeline_helper.checkers;
+package de.uni_passau.fim.se2.pipeline_helper.checkers.line_length;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import de.uni_passau.fim.se2.pipeline_helper.model.Checker;
@@ -35,17 +33,16 @@ public class LineLengthChecker implements Checker {
 
     @Override
     public CheckerResult check() throws CheckerException {
-        final Map<String, Integer> violations = new HashMap<>();
+        final List<FileLineLengthViolations> violations = new ArrayList<>();
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
-            try {
-                final int count = (int) Files.readAllLines(p).stream().filter(l -> l.length() > maxLength).count();
-                if (count > 0) {
-                    violations.put(directory.relativize(p).toString(), count);
-                }
-            }
-            catch (IOException e) {
-                throw new CheckerException("Cannot read file " + p, e);
+            final SortedMap<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
+            if (!linesWithViolations.isEmpty()) {
+                violations.add(
+                    new FileLineLengthViolations(
+                        directory.relativize(p), linesWithViolations.size(), linesWithViolations
+                    )
+                );
             }
         }
 
@@ -55,10 +52,25 @@ public class LineLengthChecker implements Checker {
 
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Found files with lines longer than %d characters:%n", maxLength));
-        for (var entry : violations.entrySet()) {
-            sb.append(String.format("%s: %d lines%n", entry.getKey(), entry.getValue()));
-        }
+        violations.forEach(sb::append);
 
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
+    }
+
+    private SortedMap<Integer, Integer> getAllViolationsWithLength(Path path) throws CheckerException {
+        SortedMap<Integer, Integer> violationsWithLength = new TreeMap<>();
+        try {
+            final List<String> lines = Files.readAllLines(path);
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).length() > maxLength) {
+                    // add one, since lines are usually enumerated starting at 1
+                    violationsWithLength.put(i + 1, lines.get(i).length());
+                }
+            }
+        }
+        catch (IOException e) {
+            throw new CheckerException("Cannot read file " + path, e);
+        }
+        return violationsWithLength;
     }
 }

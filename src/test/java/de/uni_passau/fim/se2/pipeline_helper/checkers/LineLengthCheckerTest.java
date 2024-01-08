@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import de.uni_passau.fim.se2.pipeline_helper.checkers.line_length.LineLengthChecker;
 import de.uni_passau.fim.se2.pipeline_helper.helpers.FilteredFilesStream;
 import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 
@@ -26,15 +27,58 @@ class LineLengthCheckerTest {
     }
 
     @Test
-    void checkFailed() throws Exception {
+    void checkFailedSingleViolation() throws Exception {
         final LineLengthChecker checker = new LineLengthChecker(
             dir, FilteredFilesStream.files(dir, "java"), 80
         );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
-        assertThat(result.getMessage()).contains("invalid/InvalidFile.java: 2 lines");
-        assertThat(result.getMessage()).contains("also_invalid/InvalidFile.java: 2 lines");
+        assertThat(result.getMessage()).contains(
+            """
+                invalid/InvalidFileSingleViolation.java, on 1 line:
+                    -> line 7, length 82"""
+        );
+    }
+
+    @Test
+    void checkFailedTwoViolationsDifferentFiles() throws Exception {
+        final LineLengthChecker checker = new LineLengthChecker(
+            dir, FilteredFilesStream.files(dir, "java"), 80
+        );
+        final CheckerResult result = checker.check();
+        assertThat(result.getName()).contains("LineLengthChecker");
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).contains(
+            """
+                invalid/InvalidFile.java, on 2 lines:
+                    -> line 7, length 82
+                    -> line 10, length 99"""
+        );
+        assertThat(result.getMessage()).contains(
+            """
+                also_invalid/InvalidFile.java, on 2 lines:
+                    -> line 7, length 82
+                    -> line 10, length 99"""
+        );
+    }
+
+    @Test
+    void checkFailedMoreThanTwoViolations() throws Exception {
+        final LineLengthChecker checker = new LineLengthChecker(
+            dir, FilteredFilesStream.files(dir, "java"), 80
+        );
+        final CheckerResult result = checker.check();
+        assertThat(result.getName()).contains("LineLengthChecker");
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).contains(
+            """
+                invalid/InvalidFileFourViolations.java, on 4 lines:
+                    -> line 7, length 82
+                    -> line 8, length 82
+                    -> line 9, length 82
+                    -> line 10, length 82"""
+        );
     }
 
     @Test
