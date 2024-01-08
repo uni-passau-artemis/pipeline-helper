@@ -36,7 +36,7 @@ public class LineLengthChecker implements Checker {
         final List<FileLineLengthViolations> violations = new ArrayList<>();
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
-            final Map<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
+            final SortedMap<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
             if (!linesWithViolations.isEmpty()) {
                 violations.add(
                     new FileLineLengthViolations(
@@ -57,8 +57,8 @@ public class LineLengthChecker implements Checker {
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
     }
 
-    private Map<Integer, Integer> getAllViolationsWithLength(Path path) throws CheckerException {
-        Map<Integer, Integer> violationsWithLength = new HashMap<>();
+    private SortedMap<Integer, Integer> getAllViolationsWithLength(Path path) throws CheckerException {
+        SortedMap<Integer, Integer> violationsWithLength = new TreeMap<>();
         try {
             final List<String> lines = Files.readAllLines(path);
             for (int i = 0; i < lines.size(); i++) {

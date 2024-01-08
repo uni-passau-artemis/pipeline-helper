@@ -5,9 +5,9 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers.line_length;
 
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.SortedMap;
 
-public record FileLineLengthViolations(Path file, int count, Map<Integer, Integer> violationsWithLength) {
+public record FileLineLengthViolations(Path file, int count, SortedMap<Integer, Integer> violationsWithLength) {
 
     @Override
     public String toString() {
