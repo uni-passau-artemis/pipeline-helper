@@ -6,19 +6,18 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers.line_length;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
-public record FileLineLengthViolations(Path file, int count, List<Integer> lines) {
+public record FileLineLengthViolations(Path file, int count, Map<Integer, Integer> violationsWithLength) {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        String lineOrLines = lines.size() > 1 ? "lines" : "line";
-        sb.append(String.format("%s, on %d %s: ", file.toString(), count, lineOrLines));
-        if (lines.size() > 1) {
-            // append all elements with comma, except the last one, which is appended using '&'
-            sb.append(String.join(", ", lines.subList(0, lines.size() - 1).stream().map(Object::toString).toList()));
-            sb.append(" & ");
-        }
-        sb.append(lines.get(lines.size() - 1));
+        String lineOrLines = violationsWithLength.size() > 1 ? "lines" : "line";
+        sb.append(String.format("%s, on %d %s:%n", file.toString(), count, lineOrLines));
+        violationsWithLength.forEach((index, length) -> {
+            sb.append(String.format("    -> line %d, length %d%n", index, length));
+        });
         return sb.toString();
     }
 }
+    

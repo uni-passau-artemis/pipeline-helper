@@ -36,7 +36,7 @@ public class LineLengthChecker implements Checker {
         List<FileLineLengthViolations> violations = new ArrayList<>();
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
-            final List<Integer> linesWithViolations = getAllLineIndicesWithViolations(p);
+            final Map<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
             if (!linesWithViolations.isEmpty()) {
                 violations.add(new FileLineLengthViolations(directory.relativize(p), linesWithViolations.size(), linesWithViolations));
             }
@@ -53,19 +53,19 @@ public class LineLengthChecker implements Checker {
         return new CheckerResult(CHECKER_NAME, false, sb.toString().trim());
     }
     
-    private List<Integer> getAllLineIndicesWithViolations(Path path) throws CheckerException {
-        List<Integer> lineNumbers = new ArrayList<>();
+    private Map<Integer, Integer> getAllViolationsWithLength(Path path) throws CheckerException {
+        Map<Integer, Integer> violationsWithLength = new HashMap<>();
         try {
             final List<String> lines = Files.readAllLines(path);
             for (int i = 0; i < lines.size(); i++) {
                 if (lines.get(i).length() > maxLength) {
                     // add one, since lines are usually enumerated starting at 1
-                    lineNumbers.add(i + 1);
+                    violationsWithLength.put(i + 1, lines.get(i).length());
                 }
             }
         } catch (IOException e) {
             throw new CheckerException("Cannot read file " + path, e);
         }
-        return lineNumbers;
+        return violationsWithLength;
     }
 }
