@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public record FileLineLengthViolations(Path file, int count, Map<Integer, Integer> violationsWithLength) {
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -20,4 +21,3 @@ public record FileLineLengthViolations(Path file, int count, Map<Integer, Intege
         return sb.toString();
     }
 }
-    
