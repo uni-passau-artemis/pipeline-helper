@@ -7,6 +7,7 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static de.uni_passau.fim.se2.pipeline_helper.TestUtil.resource;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
@@ -35,9 +36,11 @@ class LineLengthCheckerTest {
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
         assertThat(result.getMessage()).contains(
-            """
-                invalid/InvalidFileSingleViolation.java, on 1 line:
-                    -> line 7, length 82"""
+            withNormalisedNewline(
+                """
+                    invalid%sInvalidFileSingleViolation.java, on 1 line:
+                        -> line 7, length 82""".formatted(File.separator)
+            )
         );
     }
 
@@ -50,16 +53,20 @@ class LineLengthCheckerTest {
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
         assertThat(result.getMessage()).contains(
-            """
-                invalid/InvalidFile.java, on 2 lines:
-                    -> line 7, length 82
-                    -> line 10, length 99"""
+            withNormalisedNewline(
+                """
+                    invalid%sInvalidFile.java, on 2 lines:
+                        -> line 7, length 82
+                        -> line 10, length 99""".formatted(File.separator)
+            )
         );
         assertThat(result.getMessage()).contains(
-            """
-                also_invalid/InvalidFile.java, on 2 lines:
-                    -> line 7, length 82
-                    -> line 10, length 99"""
+            withNormalisedNewline(
+                """
+                    also_invalid%sInvalidFile.java, on 2 lines:
+                        -> line 7, length 82
+                        -> line 10, length 99""".formatted(File.separator)
+            )
         );
     }
 
@@ -72,12 +79,14 @@ class LineLengthCheckerTest {
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
         assertThat(result.getMessage()).contains(
-            """
-                invalid/InvalidFileFourViolations.java, on 4 lines:
-                    -> line 7, length 82
-                    -> line 8, length 82
-                    -> line 9, length 82
-                    -> line 10, length 82"""
+            withNormalisedNewline(
+                """
+                    invalid%sInvalidFileFourViolations.java, on 4 lines:
+                        -> line 7, length 82
+                        -> line 8, length 82
+                        -> line 9, length 82
+                        -> line 10, length 82""".formatted(File.separator)
+            )
         );
     }
 
@@ -90,5 +99,9 @@ class LineLengthCheckerTest {
         final CheckerResult result = checker.check();
         final CheckerResult expectedResult = new CheckerResult("LineLengthChecker", true);
         assertThat(result).isEqualTo(expectedResult);
+    }
+
+    private String withNormalisedNewline(final String message) {
+        return message.replace("\n", System.lineSeparator());
     }
 }
