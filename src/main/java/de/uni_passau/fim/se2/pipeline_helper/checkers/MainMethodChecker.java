@@ -6,7 +6,6 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -109,15 +108,10 @@ public class MainMethodChecker implements Checker {
     }
 
     private boolean isMainMethod(final Method method) {
-        return hasCorrectReturnTypeForMainMethod(method) && hasCorrectModifiersForMainMethod(method);
+        return hasCorrectReturnTypeForMainMethod(method);
     }
 
     private boolean hasCorrectReturnTypeForMainMethod(final Method method) {
         return method.getReturnType().equals(Void.TYPE);
-    }
-
-    private boolean hasCorrectModifiersForMainMethod(final Method method) {
-        final int modifiers = method.getModifiers();
-        return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers);
     }
 }
