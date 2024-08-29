@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,17 +99,24 @@ public class MainMethodChecker implements Checker {
     }
 
     private boolean hasMainMethod(final Class<?> cls) {
-        try {
-            final Method mainMethod = cls.getDeclaredMethod("main", String[].class);
-            return isMainMethod(mainMethod);
-        }
-        catch (NoSuchMethodException e) {
-            return false;
-        }
+        List<Method> mainMethods = Arrays.stream(cls.getDeclaredMethods())
+            .filter(this::isMainMethod).toList();
+        // Only support a single candidate for a main method in a class
+        return mainMethods.size() == 1;
     }
 
     private boolean isMainMethod(final Method method) {
-        return hasCorrectReturnTypeForMainMethod(method);
+        return hasCorrectNameForMainMethod(method) && hasCorrectParametersForMainMethod(method)
+            && hasCorrectReturnTypeForMainMethod(method);
+    }
+
+    private boolean hasCorrectNameForMainMethod(final Method method) {
+        return "main".equals(method.getName());
+    }
+
+    private boolean hasCorrectParametersForMainMethod(final Method method) {
+        return method.getParameterCount() == 0
+            || method.getParameterCount() == 1 && method.getParameters()[0].getType().equals(String[].class);
     }
 
     private boolean hasCorrectReturnTypeForMainMethod(final Method method) {
