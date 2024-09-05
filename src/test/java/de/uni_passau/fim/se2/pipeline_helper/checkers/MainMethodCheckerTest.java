@@ -39,7 +39,7 @@ class MainMethodCheckerTest {
             // Check if message contains only valid classes and the correct number of them.
             () -> assertThat(result.getMessage())
                 .matches("Found multiple main methods:" +
-                    "(\\nde.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodExamples.valid.[a-zA-Z]+){%d}".formatted(validMainMethods))
+                    "(\\nde\\.uni_passau\\.fim\\.se2\\.pipeline_helper\\.checkers\\.MainMethodExamples\\.valid\\.[a-zA-Z]+){%d}".formatted(validMainMethods))
         );
     }
 
