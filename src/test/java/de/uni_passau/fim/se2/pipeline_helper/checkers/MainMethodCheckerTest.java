@@ -32,14 +32,14 @@ class MainMethodCheckerTest {
     void checkerMultipleMainMethods() throws CheckerException {
         final MainMethodChecker checker = new MainMethodChecker(Path.of("target/test-classes/"));
         final CheckerResult result = checker.check();
+        final int validMainMethods = 8;
 
         assertAll(
             () -> assertThat(result.isSuccessful()).isFalse(),
-            () -> assertThat(result.getMessage()).contains("Found multiple main methods:"),
+            // Check if message contains only valid classes and the correct number of them.
             () -> assertThat(result.getMessage())
-                .contains("de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodCheckerTest"),
-            () -> assertThat(result.getMessage())
-                .contains("de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodCheckerTest$InnerClassMain")
+                .matches("Found multiple main methods:" +
+                    "(\\nde.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodExamples.valid.[a-zA-Z]+){%d}".formatted(validMainMethods))
         );
     }
 
@@ -55,38 +55,4 @@ class MainMethodCheckerTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-    public static void main(String[] args) {
-    }
-
-    public static class InnerClassMain {
-
-        public static void main(String... args) {
-        }
-    }
-
-    public static class InvalidModifiers {
-
-        void main(String[] args) {
-        }
-    }
-
-    public static class InvalidModifiers2 {
-
-        public void main(String[] args) {
-        }
-    }
-
-    public static class InvalidModifiers3 {
-
-        static void main(String[] args) {
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class InvalidReturnType {
-
-        public static int main(String[] args) {
-            return 0;
-        }
-    }
 }
