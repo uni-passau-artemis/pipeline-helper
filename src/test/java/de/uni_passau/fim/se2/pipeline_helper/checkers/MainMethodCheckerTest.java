@@ -7,7 +7,9 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,14 +34,15 @@ class MainMethodCheckerTest {
     void checkerMultipleMainMethods() throws CheckerException {
         final MainMethodChecker checker = new MainMethodChecker(Path.of("target/test-classes/"));
         final CheckerResult result = checker.check();
-        final int validMainMethods = 8;
+        final String packagePath = "de/uni_passau/fim/se2/pipeline_helper/checkers/MainMethodExamples/valid/";
+        final int validCount = Objects.requireNonNull(new File("src/test/java/" + packagePath).list()).length;
 
         assertAll(
             () -> assertThat(result.isSuccessful()).isFalse(),
             // Check if message contains only valid classes and the correct number of them.
             () -> assertThat(result.getMessage())
                 .matches("Found multiple main methods:" +
-                    "(\\nde\\.uni_passau\\.fim\\.se2\\.pipeline_helper\\.checkers\\.MainMethodExamples\\.valid\\.[a-zA-Z]+){%d}".formatted(validMainMethods))
+                    "(\\n%s[a-zA-Z]+){%d}".formatted(packagePath.replace("/", "\\."), validCount))
         );
     }
 
