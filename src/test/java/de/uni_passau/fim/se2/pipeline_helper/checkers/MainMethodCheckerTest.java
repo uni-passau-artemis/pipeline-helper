@@ -41,8 +41,10 @@ class MainMethodCheckerTest {
             () -> assertThat(result.isSuccessful()).isFalse(),
             // Check if message contains only valid classes and the correct number of them.
             () -> assertThat(result.getMessage())
-                .matches("Found multiple main methods:" +
-                    "(\\n%s[a-zA-Z]+){%d}".formatted(packagePath.replace("/", "\\."), validCount))
+                .matches(
+                    "Found multiple main methods:" +
+                        "(\\n%s[a-zA-Z]+){%d}".formatted(packagePath.replace("/", "\\."), validCount)
+                )
         );
     }
 
