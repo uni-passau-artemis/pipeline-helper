@@ -2,12 +2,11 @@
 //
 // SPDX-License-Identifier: CC0-1.0
 
-package de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodExamples.invalid;
+package de.uni_passau.fim.se2.pipeline_helper.checkers.mainMethodExamples.valid;
 
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
-public class ReturnType {
+public class PublicStaticStringArrayParam {
 
-    public static int main(String[] args) {
-        return 0;
+    public static void main(String[] args) {
     }
 }
