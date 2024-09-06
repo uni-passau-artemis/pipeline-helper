@@ -29,6 +29,18 @@ public class MainMethodChecker implements Checker {
 
     private final Path classpath;
 
+    private record MainMethodInfo(Class<?> cls, int mainMethodCount) {
+        @Override
+        public String toString() {
+            String name = cls.getName();
+            if (mainMethodCount == 1) {
+                return name;
+            } else {
+                return name + " (x%d)".formatted(mainMethodCount);
+            }
+        }
+    }
+
     public MainMethodChecker(final Path classpath) {
         this.classpath = classpath;
     }
@@ -36,7 +48,7 @@ public class MainMethodChecker implements Checker {
     @Override
     public CheckerResult check() throws CheckerException {
         try {
-            final List<Class<?>> filesWithMainMethods = findMainMethods();
+            final List<MainMethodInfo> filesWithMainMethods = findMainMethods();
             return getCheckerResult(filesWithMainMethods);
         }
         catch (IOException e) {
@@ -44,12 +56,12 @@ public class MainMethodChecker implements Checker {
         }
     }
 
-    private static CheckerResult getCheckerResult(List<Class<?>> filesWithMainMethods) throws CheckerException {
+    private CheckerResult getCheckerResult(List<MainMethodInfo> filesWithMainMethods) throws CheckerException {
         if (filesWithMainMethods.isEmpty()) {
             return new CheckerResult(CHECKER_NAME, false, "Could not find a main method!");
         }
-        else if (filesWithMainMethods.size() == 1) {
-            final String mainClass = filesWithMainMethods.stream().findFirst().map(Class::getName).orElseThrow();
+        else if (filesWithMainMethods.size() == 1 && filesWithMainMethods.get(0).mainMethodCount == 1) {
+            final String mainClass = filesWithMainMethods.stream().findFirst().map(MainMethodInfo::toString).orElseThrow();
             System.out.println(mainClass);
             return new CheckerResult(
                 CHECKER_NAME,
@@ -59,7 +71,7 @@ public class MainMethodChecker implements Checker {
         }
         else {
             final String filesWithMainMethod = filesWithMainMethods.stream()
-                .map(Class::getName)
+                .map(MainMethodInfo::toString)
                 .collect(Collectors.joining("\n"));
             return new CheckerResult(
                 CHECKER_NAME,
@@ -69,14 +81,15 @@ public class MainMethodChecker implements Checker {
         }
     }
 
-    private List<Class<?>> findMainMethods() throws IOException {
+    private List<MainMethodInfo> findMainMethods() throws IOException {
         final URL classPathUrl = classpath.toFile().toURI().toURL();
         try (URLClassLoader cl = new URLClassLoader(new URL[] { classPathUrl })) {
             return FilteredFilesStream.files(classpath, "class")
                 .map(this::getClassName)
                 .map(className -> loadClass(cl, className))
                 .flatMap(Optional::stream)
-                .filter(this::hasMainMethod)
+                .map(this::getMainMethodInfo)
+                .filter(mainMethodInfo -> mainMethodInfo.mainMethodCount > 0)
                 .toList();
         }
     }
@@ -99,11 +112,10 @@ public class MainMethodChecker implements Checker {
         }
     }
 
-    private boolean hasMainMethod(final Class<?> cls) {
+    private MainMethodInfo getMainMethodInfo(final Class<?> cls) {
         List<Method> mainMethods = Arrays.stream(cls.getDeclaredMethods())
             .filter(this::isMainMethod).toList();
-        // Only support a single candidate for a main method in a class
-        return mainMethods.size() == 1;
+        return new MainMethodInfo(cls, mainMethods.size());
     }
 
     private boolean isMainMethod(final Method method) {
