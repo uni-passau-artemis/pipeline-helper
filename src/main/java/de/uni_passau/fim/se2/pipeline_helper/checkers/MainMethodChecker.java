@@ -30,12 +30,14 @@ public class MainMethodChecker implements Checker {
     private final Path classpath;
 
     private record MainMethodInfo(Class<?> cls, int mainMethodCount) {
+
         @Override
         public String toString() {
             String name = cls.getName();
             if (mainMethodCount == 1) {
                 return name;
-            } else {
+            }
+            else {
                 return name + " (x%d)".formatted(mainMethodCount);
             }
         }
@@ -61,7 +63,8 @@ public class MainMethodChecker implements Checker {
             return new CheckerResult(CHECKER_NAME, false, "Could not find a main method!");
         }
         else if (filesWithMainMethods.size() == 1 && filesWithMainMethods.get(0).mainMethodCount == 1) {
-            final String mainClass = filesWithMainMethods.stream().findFirst().map(MainMethodInfo::toString).orElseThrow();
+            final String mainClass = filesWithMainMethods.stream().findFirst().map(MainMethodInfo::toString)
+                .orElseThrow();
             System.out.println(mainClass);
             return new CheckerResult(
                 CHECKER_NAME,

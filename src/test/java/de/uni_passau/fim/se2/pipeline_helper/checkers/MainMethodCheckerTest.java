@@ -47,7 +47,8 @@ class MainMethodCheckerTest {
                         "(\\n%s[a-zA-Z]+( \\(x[0-9]+\\))?){%d}".formatted(packagePath.replace("/", "\\."), validCount)
                 ),
             // Check for number of main methods for classes with more than one valid main method
-            () -> assertThat(result.getMessage()).contains(packagePath.replace('/', '.') + "MultipleValidMethods (x2)\n")
+            () -> assertThat(result.getMessage())
+                .contains(packagePath.replace('/', '.') + "MultipleValidMethods (x2)\n")
         );
     }
 
