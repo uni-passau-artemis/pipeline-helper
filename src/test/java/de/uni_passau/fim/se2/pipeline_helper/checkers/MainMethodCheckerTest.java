@@ -34,7 +34,7 @@ class MainMethodCheckerTest {
     void checkerMultipleMainMethods() throws CheckerException {
         final MainMethodChecker checker = new MainMethodChecker(Path.of("target/test-classes/"));
         final CheckerResult result = checker.check();
-        final String packagePath = "de/uni_passau/fim/se2/pipeline_helper/checkers/mainMethodExamples/valid/";
+        final String packagePath = "de/uni_passau/fim/se2/pipeline_helper/checkers/main_method_examples/valid/";
         final int validCount = Objects.requireNonNull(new File("src/test/java/" + packagePath).list()).length
             - 1; // Without package-info.java
 
