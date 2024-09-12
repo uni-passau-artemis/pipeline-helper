@@ -141,6 +141,6 @@ public class MainMethodChecker implements Checker {
 
     private boolean hasCorrectModifierForMainMethod(final Method method) {
         final int modifiers = method.getModifiers();
-        return !Modifier.isPrivate(modifiers);
+        return !Modifier.isPrivate(modifiers) && !Modifier.isAbstract(modifiers);
     }
 }
