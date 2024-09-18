@@ -10,7 +10,8 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -116,9 +117,19 @@ public class MainMethodChecker implements Checker {
     }
 
     private MainMethodInfo getMainMethodInfo(final Class<?> cls) {
-        List<Method> mainMethods = Arrays.stream(cls.getDeclaredMethods())
+        List<Method> mainMethods = getMethodsWithInherited(cls).stream()
             .filter(this::isMainMethod).toList();
         return new MainMethodInfo(cls, mainMethods.size());
+    }
+
+    private List<Method> getMethodsWithInherited(Class<?> cls) {
+        List<Method> methods = new LinkedList<>();
+        do {
+            Collections.addAll(methods, cls.getDeclaredMethods());
+            cls = cls.getSuperclass();
+        }
+        while (cls != null);
+        return methods;
     }
 
     private boolean isMainMethod(final Method method) {
