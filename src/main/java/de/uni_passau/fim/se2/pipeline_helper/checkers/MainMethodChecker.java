@@ -10,6 +10,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,6 +93,7 @@ public class MainMethodChecker implements Checker {
                 .map(this::getClassName)
                 .map(className -> loadClass(cl, className))
                 .flatMap(Optional::stream)
+                .filter(cls -> !cls.isInterface()) // interfaces cannot be executed
                 .map(this::getMainMethodInfo)
                 .filter(mainMethodInfo -> mainMethodInfo.mainMethodCount > 0)
                 .toList();
@@ -124,8 +126,13 @@ public class MainMethodChecker implements Checker {
 
     private List<Method> getMethodsWithInherited(Class<?> cls) {
         List<Method> methods = new LinkedList<>();
+        // Add all public methods directly to catch also methods from interfaces.
+        Collections.addAll(methods, cls.getMethods());
+        // Add non-public methods from the class and all super classes
         do {
-            Collections.addAll(methods, cls.getDeclaredMethods());
+            Arrays.stream(cls.getDeclaredMethods())
+                .filter(method -> !Modifier.isPublic(method.getModifiers()))
+                .forEach(methods::add);
             cls = cls.getSuperclass();
         }
         while (cls != null);
