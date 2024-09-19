@@ -93,7 +93,6 @@ public class MainMethodChecker implements Checker {
                 .map(this::getClassName)
                 .map(className -> loadClass(cl, className))
                 .flatMap(Optional::stream)
-                .filter(cls -> !cls.isInterface()) // interfaces cannot be executed
                 .map(this::getMainMethodInfo)
                 .filter(mainMethodInfo -> mainMethodInfo.mainMethodCount > 0)
                 .toList();
@@ -126,16 +125,25 @@ public class MainMethodChecker implements Checker {
 
     private List<Method> getMethodsWithInherited(Class<?> cls) {
         List<Method> methods = new LinkedList<>();
-        // Add all public methods directly to catch also methods from interfaces.
-        Collections.addAll(methods, cls.getMethods());
-        // Add non-public methods from the class and all super classes
-        do {
-            Arrays.stream(cls.getDeclaredMethods())
-                .filter(method -> !Modifier.isPublic(method.getModifiers()))
+        if (cls.isInterface()) {
+            // Only public static methods in interfaces can be valid main methods.
+            Arrays.stream(cls.getMethods())
+                .filter(method -> Modifier.isStatic(method.getModifiers()))
                 .forEach(methods::add);
-            cls = cls.getSuperclass();
+
         }
-        while (cls != null);
+        else {
+            // Add all public methods directly to catch also methods from interfaces.
+            Collections.addAll(methods, cls.getMethods());
+            // Add non-public methods from the class and all super classes
+            do {
+                Arrays.stream(cls.getDeclaredMethods())
+                    .filter(method -> !Modifier.isPublic(method.getModifiers()))
+                    .forEach(methods::add);
+                cls = cls.getSuperclass();
+            }
+            while (cls != null);
+        }
         return methods;
     }
 
