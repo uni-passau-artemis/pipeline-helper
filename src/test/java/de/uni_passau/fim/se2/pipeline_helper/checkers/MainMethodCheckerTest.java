@@ -7,7 +7,9 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,14 +34,21 @@ class MainMethodCheckerTest {
     void checkerMultipleMainMethods() throws CheckerException {
         final MainMethodChecker checker = new MainMethodChecker(Path.of("target/test-classes/"));
         final CheckerResult result = checker.check();
+        final String packagePath = "de/uni_passau/fim/se2/pipeline_helper/checkers/main_method_examples/valid/";
+        final int validCount = Objects.requireNonNull(new File("src/test/java/" + packagePath).list()).length
+            - 1; // Without package-info.java
 
         assertAll(
             () -> assertThat(result.isSuccessful()).isFalse(),
-            () -> assertThat(result.getMessage()).contains("Found multiple main methods:"),
+            // Check if message contains only valid classes and the correct number of them.
             () -> assertThat(result.getMessage())
-                .contains("de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodCheckerTest"),
+                .matches(
+                    "Found multiple main methods:" +
+                        "(\\n%s[a-zA-Z]+( \\(x[0-9]+\\))?){%d}".formatted(packagePath.replace("/", "\\."), validCount)
+                ),
+            // Check for number of main methods for classes with more than one valid main method
             () -> assertThat(result.getMessage())
-                .contains("de.uni_passau.fim.se2.pipeline_helper.checkers.MainMethodCheckerTest$InnerClassMain")
+                .contains(packagePath.replace('/', '.') + "MultipleValidMethods (x2)\n")
         );
     }
 
@@ -55,38 +64,4 @@ class MainMethodCheckerTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-    public static void main(String[] args) {
-    }
-
-    public static class InnerClassMain {
-
-        public static void main(String... args) {
-        }
-    }
-
-    public static class InvalidModifiers {
-
-        void main(String[] args) {
-        }
-    }
-
-    public static class InvalidModifiers2 {
-
-        public void main(String[] args) {
-        }
-    }
-
-    public static class InvalidModifiers3 {
-
-        static void main(String[] args) {
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class InvalidReturnType {
-
-        public static int main(String[] args) {
-            return 0;
-        }
-    }
 }

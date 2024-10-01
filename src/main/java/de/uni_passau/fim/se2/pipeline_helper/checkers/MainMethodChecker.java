@@ -10,6 +10,9 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +31,20 @@ public class MainMethodChecker implements Checker {
 
     private final Path classpath;
 
+    private record MainMethodInfo(Class<?> cls, int mainMethodCount) {
+
+        @Override
+        public String toString() {
+            String name = cls.getName();
+            if (mainMethodCount == 1) {
+                return name;
+            }
+            else {
+                return name + " (x%d)".formatted(mainMethodCount);
+            }
+        }
+    }
+
     public MainMethodChecker(final Path classpath) {
         this.classpath = classpath;
     }
@@ -35,7 +52,7 @@ public class MainMethodChecker implements Checker {
     @Override
     public CheckerResult check() throws CheckerException {
         try {
-            final List<Class<?>> filesWithMainMethods = findMainMethods();
+            final List<MainMethodInfo> filesWithMainMethods = findMainMethods();
             return getCheckerResult(filesWithMainMethods);
         }
         catch (IOException e) {
@@ -43,12 +60,13 @@ public class MainMethodChecker implements Checker {
         }
     }
 
-    private static CheckerResult getCheckerResult(List<Class<?>> filesWithMainMethods) throws CheckerException {
+    private CheckerResult getCheckerResult(List<MainMethodInfo> filesWithMainMethods) throws CheckerException {
         if (filesWithMainMethods.isEmpty()) {
             return new CheckerResult(CHECKER_NAME, false, "Could not find a main method!");
         }
-        else if (filesWithMainMethods.size() == 1) {
-            final String mainClass = filesWithMainMethods.stream().findFirst().map(Class::getName).orElseThrow();
+        else if (filesWithMainMethods.size() == 1 && filesWithMainMethods.get(0).mainMethodCount == 1) {
+            final String mainClass = filesWithMainMethods.stream().findFirst().map(MainMethodInfo::toString)
+                .orElseThrow();
             System.out.println(mainClass);
             return new CheckerResult(
                 CHECKER_NAME,
@@ -58,7 +76,7 @@ public class MainMethodChecker implements Checker {
         }
         else {
             final String filesWithMainMethod = filesWithMainMethods.stream()
-                .map(Class::getName)
+                .map(MainMethodInfo::toString)
                 .collect(Collectors.joining("\n"));
             return new CheckerResult(
                 CHECKER_NAME,
@@ -68,14 +86,15 @@ public class MainMethodChecker implements Checker {
         }
     }
 
-    private List<Class<?>> findMainMethods() throws IOException {
+    private List<MainMethodInfo> findMainMethods() throws IOException {
         final URL classPathUrl = classpath.toFile().toURI().toURL();
         try (URLClassLoader cl = new URLClassLoader(new URL[] { classPathUrl })) {
             return FilteredFilesStream.files(classpath, "class")
                 .map(this::getClassName)
                 .map(className -> loadClass(cl, className))
                 .flatMap(Optional::stream)
-                .filter(this::hasMainMethod)
+                .map(this::getMainMethodInfo)
+                .filter(mainMethodInfo -> mainMethodInfo.mainMethodCount > 0)
                 .toList();
         }
     }
@@ -98,26 +117,56 @@ public class MainMethodChecker implements Checker {
         }
     }
 
-    private boolean hasMainMethod(final Class<?> cls) {
-        try {
-            final Method mainMethod = cls.getDeclaredMethod("main", String[].class);
-            return isMainMethod(mainMethod);
+    private MainMethodInfo getMainMethodInfo(final Class<?> cls) {
+        List<Method> mainMethods = getMethodsWithInherited(cls).stream()
+            .filter(this::isMainMethod).toList();
+        return new MainMethodInfo(cls, mainMethods.size());
+    }
+
+    private List<Method> getMethodsWithInherited(Class<?> cls) {
+        List<Method> methods = new LinkedList<>();
+        if (cls.isInterface()) {
+            // Only public static methods in interfaces can be valid main methods.
+            Arrays.stream(cls.getMethods())
+                .filter(method -> Modifier.isStatic(method.getModifiers()))
+                .forEach(methods::add);
+
         }
-        catch (NoSuchMethodException e) {
-            return false;
+        else {
+            // Add all public methods directly to catch also methods from interfaces.
+            Collections.addAll(methods, cls.getMethods());
+            // Add non-public methods from the class and all super classes
+            do {
+                Arrays.stream(cls.getDeclaredMethods())
+                    .filter(method -> !Modifier.isPublic(method.getModifiers()))
+                    .forEach(methods::add);
+                cls = cls.getSuperclass();
+            }
+            while (cls != null);
         }
+        return methods;
     }
 
     private boolean isMainMethod(final Method method) {
-        return hasCorrectReturnTypeForMainMethod(method) && hasCorrectModifiersForMainMethod(method);
+        return hasCorrectNameForMainMethod(method) && hasCorrectParametersForMainMethod(method)
+            && hasCorrectReturnTypeForMainMethod(method) && hasCorrectModifierForMainMethod(method);
+    }
+
+    private boolean hasCorrectNameForMainMethod(final Method method) {
+        return "main".equals(method.getName());
+    }
+
+    private boolean hasCorrectParametersForMainMethod(final Method method) {
+        return method.getParameterCount() == 0
+            || method.getParameterCount() == 1 && method.getParameters()[0].getType().equals(String[].class);
     }
 
     private boolean hasCorrectReturnTypeForMainMethod(final Method method) {
         return method.getReturnType().equals(Void.TYPE);
     }
 
-    private boolean hasCorrectModifiersForMainMethod(final Method method) {
+    private boolean hasCorrectModifierForMainMethod(final Method method) {
         final int modifiers = method.getModifiers();
-        return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers);
+        return !Modifier.isPrivate(modifiers) && !Modifier.isAbstract(modifiers);
     }
 }
