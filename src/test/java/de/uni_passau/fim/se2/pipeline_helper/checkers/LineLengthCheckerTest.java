@@ -45,9 +45,10 @@ class LineLengthCheckerTest {
     }
 
     @Test
-    void checkFailedTwoViolationsDifferentFiles() throws Exception {
+    void checkFailedDifferentFiles() throws Exception {
+        Path invalidDir = dir.resolve("invalid/");
         final LineLengthChecker checker = new LineLengthChecker(
-            dir, FilteredFilesStream.files(dir, "java"), 80
+            invalidDir, FilteredFilesStream.files(invalidDir, "java"), 80
         );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
@@ -55,39 +56,28 @@ class LineLengthCheckerTest {
         assertThat(result.getMessage()).contains(
             withNormalisedNewline(
                 """
-                    invalid%sInvalidFile.java, on 2 lines:
+                    InvalidFile.java, on 2 lines:
                         -> line 7, length 82
-                        -> line 10, length 99""".formatted(File.separator)
+                        -> line 10, length 99"""
             )
         );
-        assertThat(result.getMessage()).contains(
-            withNormalisedNewline(
+        withNormalisedNewline(
                 """
-                    also_invalid%sInvalidFile.java, on 2 lines:
-                        -> line 7, length 82
-                        -> line 10, length 99""".formatted(File.separator)
-            )
+                    invalidFileSingleViolation.java, on 1 line:
+                        -> line 7, length 82"""
         );
     }
 
     @Test
-    void checkFailedMoreThanTwoViolations() throws Exception {
+    void checkFailedIllegalByteSequence() throws Exception {
+        Path illegalByteSeqDir = dir.resolve("illegal_byte_sequence/");
         final LineLengthChecker checker = new LineLengthChecker(
-            dir, FilteredFilesStream.files(dir, "java"), 80
+            illegalByteSeqDir, FilteredFilesStream.files(illegalByteSeqDir, "java"), 80
         );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
-        assertThat(result.getMessage()).contains(
-            withNormalisedNewline(
-                """
-                    invalid%sInvalidFileFourViolations.java, on 4 lines:
-                        -> line 7, length 82
-                        -> line 8, length 82
-                        -> line 9, length 82
-                        -> line 10, length 82""".formatted(File.separator)
-            )
-        );
+        assertThat(result.getMessage()).isEqualTo("Invalid byte sequence in file InvalidByteSequence.java");
     }
 
     @Test

@@ -5,6 +5,8 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers.line_length;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -36,7 +38,12 @@ public class LineLengthChecker implements Checker {
         final List<FileLineLengthViolations> violations = new ArrayList<>();
         for (Iterator<Path> it = files.iterator(); it.hasNext();) {
             final Path p = it.next();
-            final SortedMap<Integer, Integer> linesWithViolations = getAllViolationsWithLength(p);
+            final SortedMap<Integer, Integer> linesWithViolations;
+            try {
+                linesWithViolations = getAllViolationsWithLength(p);
+            } catch (CheckerException e) {
+                return new CheckerResult(CHECKER_NAME, false, e.getMessage());
+            }
             if (!linesWithViolations.isEmpty()) {
                 violations.add(new FileLineLengthViolations(directory.relativize(p), linesWithViolations));
             }
@@ -57,7 +64,7 @@ public class LineLengthChecker implements Checker {
         try (Stream<String> lines = Files.lines(path)) {
             return getAllViolationWithLength(lines);
         }
-        catch (IOException e) {
+        catch (IOException | UncheckedIOException e) {
             throw new CheckerException("Cannot read file " + path, e);
         }
     }
