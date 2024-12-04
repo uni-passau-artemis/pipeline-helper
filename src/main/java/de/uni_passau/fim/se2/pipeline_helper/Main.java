@@ -119,6 +119,7 @@ public final class Main implements Runnable {
                 System.out.println("Successfully produced a checker result.");
             }
             catch (Exception e) {
+                e.printStackTrace();
                 result = new CheckerResult(
                     "Error", false,
                     "The checker crashed. Please contact your instructor to resolve the issue."
