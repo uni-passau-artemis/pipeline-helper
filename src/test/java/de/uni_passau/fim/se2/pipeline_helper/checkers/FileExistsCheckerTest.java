@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import de.uni_passau.fim.se2.pipeline_helper.checkers.file_exists.FileExistsChecker;
 import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 
 class FileExistsCheckerTest {
@@ -43,12 +44,12 @@ class FileExistsCheckerTest {
         final CheckerResult result = checker.check();
         assertThat(result.isSuccessful()).isFalse();
         assertThat(result.getMessage()).isEqualTo("""
-            Empty or non-readable files:
+            Empty files:
             empty.txt""");
     }
 
     @Test
-    void shouldRecogniseNonExistingFiles() throws Exception {
+    void shouldRecogniseMissingFiles() throws Exception {
         final FileExistsChecker checker = new FileExistsChecker(
             List.of(
                 resource("dejagnu_logs/gcd.log"),
@@ -65,12 +66,28 @@ class FileExistsCheckerTest {
     }
 
     @Test
-    void shouldRecogniseEmptyAndNonExistingFiles() throws Exception {
+    void shouldRecogniseNonReadableFiles() throws Exception {
+        final FileExistsChecker checker = new FileExistsChecker(
+            List.of(
+                resource("line_length_checker_demo_files/illegal_byte_sequence/InvalidByteSequence.java")
+            )
+        );
+
+        final CheckerResult result = checker.check();
+        assertThat(result.isSuccessful()).isFalse();
+        assertThat(result.getMessage()).isEqualTo("""
+            Non-readable files:
+            InvalidByteSequence.java""");
+    }
+
+    @Test
+    void shouldRecogniseEmptyAndMissingAndNonReadableFiles() throws Exception {
         final FileExistsChecker checker = new FileExistsChecker(
             List.of(
                 resource("empty.txt"),
                 resource("dejagnu_logs/gcd.log"),
                 resource("dejagnu_logs/gcd2.log"),
+                resource("line_length_checker_demo_files/illegal_byte_sequence/InvalidByteSequence.java"),
                 Path.of("non-existing-file.txt")
             )
         );
@@ -81,7 +98,10 @@ class FileExistsCheckerTest {
             Missing files:
             non-existing-file.txt
 
-            Empty or non-readable files:
-            empty.txt""");
+            Empty files:
+            empty.txt
+
+            Non-readable files:
+            InvalidByteSequence.java""");
     }
 }
