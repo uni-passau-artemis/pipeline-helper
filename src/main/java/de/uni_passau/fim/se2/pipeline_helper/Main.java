@@ -119,8 +119,10 @@ public final class Main implements Runnable {
                 System.out.println("Successfully produced a checker result.");
             }
             catch (Exception e) {
-                result = new CheckerResult("Error", false,
-                        "The pipeline tool crashed. Please contact your instructor to resolve the issue.");
+                result = new CheckerResult(
+                    "Error", false,
+                    "The pipeline tool crashed. Please contact your instructor to resolve the issue."
+                );
             }
 
             CheckerResultWriter.writeFeedback(parent.outputDirectory, result);
