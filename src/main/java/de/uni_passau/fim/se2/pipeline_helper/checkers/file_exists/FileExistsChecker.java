@@ -33,7 +33,8 @@ public class FileExistsChecker implements Checker {
         Arrays.stream(FileStatus.values()).forEach(status -> filesByStatus.put(status, new ArrayList<>()));
 
         for (final Path p : toCheck) {
-            if (!Files.exists(p)) {
+            // 'Files.exists(path)' also returns true for directories, so we need this extra check here
+            if (!Files.exists(p) || (Files.exists(p) && Files.isDirectory(p))) {
                 filesByStatus.get(FileStatus.MISSING).add(p);
                 continue;
             }
