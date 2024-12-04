@@ -113,10 +113,20 @@ public final class Main implements Runnable {
             validateParams();
 
             final Checker checker = buildChecker();
-            final CheckerResult result = checker.check();
-            CheckerResultWriter.writeFeedback(parent.outputDirectory, result);
+            CheckerResult result;
+            try {
+                result = checker.check();
+                System.out.println("Successfully produced a checker result.");
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                result = new CheckerResult(
+                    "Error", false,
+                    "The checker crashed. Please contact your instructor to resolve the issue."
+                );
+            }
 
-            System.out.println("Successfully produced a checker result.");
+            CheckerResultWriter.writeFeedback(parent.outputDirectory, result);
 
             return 0;
         }
