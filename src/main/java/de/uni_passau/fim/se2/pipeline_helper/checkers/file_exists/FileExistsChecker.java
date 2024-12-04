@@ -34,7 +34,7 @@ public class FileExistsChecker implements Checker {
 
         for (final Path p : toCheck) {
             // 'Files.exists(path)' also returns true for directories, so we need this extra check here
-            if (!Files.exists(p) || (Files.exists(p) && Files.isDirectory(p))) {
+            if (!Files.exists(p) || Files.exists(p) && Files.isDirectory(p)) {
                 filesByStatus.get(FileStatus.MISSING).add(p);
                 continue;
             }
