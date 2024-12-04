@@ -17,8 +17,6 @@ import de.uni_passau.fim.se2.pipeline_helper.model.CheckerResult;
 
 class FileExistsCheckerTest {
 
-    private static final Path TEST_RESOURCES_PATH = Path.of("src/test/resources");
-
     @Test
     void shouldRecogniseExistingFiles() throws Exception {
         final FileExistsChecker checker = new FileExistsChecker(
@@ -83,15 +81,15 @@ class FileExistsCheckerTest {
     }
 
     @Test
-    void shouldNotConsiderAnEmptyDirectoryAFile() throws Exception {
+    void shouldNotConsiderDirectories() throws Exception {
         final FileExistsChecker checker = new FileExistsChecker(
-            List.of(TEST_RESOURCES_PATH.resolve("Tests.txt"))
+            List.of(Path.of("src"))
         );
         final CheckerResult result = checker.check();
         assertThat(result.isSuccessful()).isFalse();
         assertThat(result.getMessage()).isEqualTo("""
             Missing files:
-            Tests.txt""");
+            src""");
     }
 
     @Test
