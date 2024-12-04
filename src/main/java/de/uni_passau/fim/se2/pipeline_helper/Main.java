@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 import de.uni_passau.fim.se2.pipeline_helper.checkers.*;
+import de.uni_passau.fim.se2.pipeline_helper.checkers.file_exists.FileExistsChecker;
 import de.uni_passau.fim.se2.pipeline_helper.checkers.line_length.LineLengthChecker;
 import de.uni_passau.fim.se2.pipeline_helper.helpers.CheckerResultWriter;
 import de.uni_passau.fim.se2.pipeline_helper.helpers.FilteredFilesStream;
