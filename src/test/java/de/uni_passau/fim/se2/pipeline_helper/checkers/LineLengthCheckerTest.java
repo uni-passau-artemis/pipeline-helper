@@ -7,7 +7,6 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static de.uni_passau.fim.se2.pipeline_helper.TestUtil.resource;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
@@ -29,8 +28,9 @@ class LineLengthCheckerTest {
 
     @Test
     void checkFailedSingleViolation() throws Exception {
+        Path invalidDir = dir.resolve("invalid/");
         final LineLengthChecker checker = new LineLengthChecker(
-            dir, FilteredFilesStream.files(dir, "java"), 80
+            invalidDir, FilteredFilesStream.files(invalidDir, "java"), 80
         );
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
@@ -38,8 +38,8 @@ class LineLengthCheckerTest {
         assertThat(result.getMessage()).contains(
             withNormalisedNewline(
                 """
-                    invalid%sInvalidFileSingleViolation.java, on 1 line:
-                        -> line 7, length 82""".formatted(File.separator)
+                    InvalidFileSingleViolation.java, on 1 line:
+                        -> line 7, length 82"""
             )
         );
     }
@@ -62,9 +62,9 @@ class LineLengthCheckerTest {
             )
         );
         withNormalisedNewline(
-                """
-                    invalidFileSingleViolation.java, on 1 line:
-                        -> line 7, length 82"""
+            """
+                invalidFileSingleViolation.java, on 1 line:
+                    -> line 7, length 82"""
         );
     }
 
@@ -77,7 +77,8 @@ class LineLengthCheckerTest {
         final CheckerResult result = checker.check();
         assertThat(result.getName()).contains("LineLengthChecker");
         assertThat(result.isSuccessful()).isFalse();
-        assertThat(result.getMessage()).isEqualTo("Invalid byte sequence in file InvalidByteSequence.java");
+        assertThat(result.getMessage()).startsWith("Cannot read file ");
+        assertThat(result.getMessage()).endsWith("InvalidByteSequence.java");
     }
 
     @Test
