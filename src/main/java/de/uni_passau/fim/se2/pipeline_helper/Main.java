@@ -121,7 +121,7 @@ public final class Main implements Runnable {
             catch (Exception e) {
                 result = new CheckerResult(
                     "Error", false,
-                    "The pipeline tool crashed. Please contact your instructor to resolve the issue."
+                    "The checker crashed. Please contact your instructor to resolve the issue."
                 );
             }
 
