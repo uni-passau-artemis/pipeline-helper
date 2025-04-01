@@ -38,7 +38,7 @@ jobs:
       - name: Build
         run: mvn package -B -DskipTests=true
       - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@49866fead7de0b0083b89f5f653f9620548ccddf
+        uses: advanced-security/maven-dependency-submission-action@499642b4a194e52a38a0950b38de5474bca85c5e
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
