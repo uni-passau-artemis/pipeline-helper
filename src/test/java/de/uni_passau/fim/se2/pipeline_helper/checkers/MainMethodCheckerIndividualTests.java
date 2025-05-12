@@ -80,6 +80,4 @@ public class MainMethodCheckerIndividualTests {
         CheckerResult result = copyCompileAndCheck(sourceFile, tempDir);
         assertTrue(result.isSuccessful());
     }
-
-    // TODO: Check for project java version so the right compiler version is always available.
 }

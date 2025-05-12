@@ -44,7 +44,7 @@ class MainMethodCheckerTest {
             () -> assertThat(result.getMessage())
                 .matches(
                     "Found multiple main methods:" +
-                        "(\\n%s[a-zA-Z]+( \\(x[0-9]+\\))?){%d}".formatted(packagePath.replace("/", "\\."), validCount)
+                        "(\\n%s[a-zA-Z$]+( \\(x[0-9]+\\))?){%d}".formatted(packagePath.replace("/", "\\."), validCount)
                 ),
             // Check for number of main methods for classes with more than one valid main method
             () -> assertThat(result.getMessage())
