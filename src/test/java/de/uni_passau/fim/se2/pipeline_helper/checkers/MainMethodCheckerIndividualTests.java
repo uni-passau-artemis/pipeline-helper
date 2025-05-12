@@ -26,16 +26,18 @@ public class MainMethodCheckerIndividualTests {
     private static final Path VALID_DIR = Paths.get("src/test/java/de/uni_passau/fim/se2/pipeline_helper/checkers/main_method_examples/valid");
     private static final Path INVALID_DIR = Paths.get("src/test/java/de/uni_passau/fim/se2/pipeline_helper/checkers/main_method_examples/invalid");
 
+    private static Stream<Path> getStream(Path dir) throws IOException {
+        return Files.walk(dir)
+                .filter(Files::isRegularFile)
+                .filter(p -> p.toString().endsWith(".java") && !p.getFileName().toString().equals("package-info.java"));
+    }
+
     private static Stream<Path> getValidSources() throws IOException {
-        return Files.walk(VALID_DIR)
-            .filter(Files::isRegularFile)
-            .filter(p -> p.toString().endsWith(".java"));
+        return getStream(VALID_DIR);
     }
 
     private static Stream<Path> getInvalidSources() throws IOException {
-        return Files.walk(INVALID_DIR)
-            .filter(Files::isRegularFile)
-            .filter(p -> p.toString().endsWith(".java"));
+        return getStream(INVALID_DIR);
     }
 
     private static void compile(Path source, Path outputDirectory) throws IOException {
