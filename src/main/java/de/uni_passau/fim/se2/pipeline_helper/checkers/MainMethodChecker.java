@@ -176,9 +176,11 @@ public class MainMethodChecker implements Checker {
         if (!Modifier.isStatic(method.getModifiers())) {
             Constructor<?>[] constructors = owner.getConstructors();
             boolean isAbstract = Modifier.isAbstract(owner.getModifiers());
-            boolean hasNoArgsNonPrivateConstructor = Arrays.stream(constructors).anyMatch(item -> item.getParameterCount() == 0);
+            boolean hasNoArgsNonPrivateConstructor = Arrays.stream(constructors)
+                .anyMatch(item -> item.getParameterCount() == 0);
             return !isAbstract && hasNoArgsNonPrivateConstructor;
-        } else {
+        }
+        else {
             return true;
         }
     }
