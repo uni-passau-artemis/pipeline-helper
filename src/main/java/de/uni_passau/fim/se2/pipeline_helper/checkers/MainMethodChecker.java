@@ -175,7 +175,9 @@ public class MainMethodChecker implements Checker {
     private boolean isInstantiableInCaseOfInstanceMainMethod(final Class<?> owner, final Method method) {
         if (!Modifier.isStatic(method.getModifiers())) {
             Constructor<?>[] constructors = owner.getConstructors();
-            return Arrays.stream(constructors).anyMatch(item -> item.getParameterCount() == 0);
+            boolean isAbstract = Modifier.isAbstract(owner.getModifiers());
+            boolean hasNoArgsNonPrivateConstructor = Arrays.stream(constructors).anyMatch(item -> item.getParameterCount() == 0);
+            return !isAbstract && hasNoArgsNonPrivateConstructor;
         } else {
             return true;
         }
