@@ -67,20 +67,15 @@ public class MainMethodCheckerIndividualTests {
 
     private static CheckerResult copyCompileAndCheck(Path sourceFile, Path tempDir)
         throws IOException, CheckerException {
-        Path targetFile = tempDir.resolve(sourceFile.getFileName());
-        targetFile.toFile().delete();
-        Path tempFile = Files.copy(sourceFile, targetFile);
-        compile(tempFile, tempDir);
+        compile(sourceFile, tempDir);
         MainMethodChecker checker = new MainMethodChecker(tempDir);
-        CheckerResult result = checker.check();
-        Files.delete(tempFile);
-        return result;
+        return checker.check();
     }
 
     @ParameterizedTest(name = "[INVALID] {0}")
     @MethodSource("getInvalidSources")
     void shouldRejectInvalidMainMethod(Path sourceFile, @TempDir Path tempDir) throws IOException, CheckerException {
-        CheckerResult result = copyCompileAndCheck(sourceFile, tempDir);
+        CheckerResult result = copyCompileAndCheck(sourceFile, Paths.get("/home/stern/Downloads/Test/"));
         assertFalse(result.isSuccessful());
     }
 
