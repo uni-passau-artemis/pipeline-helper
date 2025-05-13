@@ -7,9 +7,7 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
