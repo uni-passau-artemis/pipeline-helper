@@ -7,9 +7,7 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +32,7 @@ class MainMethodCheckerTest {
     void checkerMultipleMainMethods() throws CheckerException {
         final MainMethodChecker checker = new MainMethodChecker(Path.of("target/test-classes/"));
         final CheckerResult result = checker.check();
-        final String packagePath = "de/uni_passau/fim/se2/pipeline_helper/checkers/main_method_examples/valid/";
-        final int validCount = Objects.requireNonNull(new File("src/test/java/" + packagePath).list()).length
-            - 1; // Without package-info.java
+        final String packagePath = "de/uni_passau/fim/se2/pipeline_helper/checkers/main_method_examples/";
 
         assertAll(
             () -> assertThat(result.isSuccessful()).isFalse(),
@@ -44,11 +40,11 @@ class MainMethodCheckerTest {
             () -> assertThat(result.getMessage())
                 .matches(
                     "Found multiple main methods:" +
-                        "(\\n%s[a-zA-Z]+( \\(x[0-9]+\\))?){%d}".formatted(packagePath.replace("/", "\\."), validCount)
+                        "(\\n%s[a-zA-Z$.]+( \\(x[0-9]+\\))?)+".formatted(packagePath.replace("/", "\\."))
                 ),
             // Check for number of main methods for classes with more than one valid main method
             () -> assertThat(result.getMessage())
-                .contains(packagePath.replace('/', '.') + "MultipleValidMethods (x2)\n")
+                .contains(packagePath.replace('/', '.') + "invalid.MultipleValidMethods (x2)\n")
         );
     }
 

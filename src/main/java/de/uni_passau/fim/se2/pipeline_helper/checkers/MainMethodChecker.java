@@ -5,6 +5,7 @@
 package de.uni_passau.fim.se2.pipeline_helper.checkers;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -119,7 +120,7 @@ public class MainMethodChecker implements Checker {
 
     private MainMethodInfo getMainMethodInfo(final Class<?> cls) {
         List<Method> mainMethods = getMethodsWithInherited(cls).stream()
-            .filter(this::isMainMethod).toList();
+            .filter(item -> isMainMethod(cls, item)).toList();
         return new MainMethodInfo(cls, mainMethods.size());
     }
 
@@ -147,9 +148,10 @@ public class MainMethodChecker implements Checker {
         return methods;
     }
 
-    private boolean isMainMethod(final Method method) {
+    private boolean isMainMethod(final Class<?> cls, final Method method) {
         return hasCorrectNameForMainMethod(method) && hasCorrectParametersForMainMethod(method)
-            && hasCorrectReturnTypeForMainMethod(method) && hasCorrectModifierForMainMethod(method);
+            && hasCorrectReturnTypeForMainMethod(method) && hasCorrectModifierForMainMethod(method)
+            && isInstantiableInCaseOfInstanceMainMethod(cls, method);
     }
 
     private boolean hasCorrectNameForMainMethod(final Method method) {
@@ -168,5 +170,18 @@ public class MainMethodChecker implements Checker {
     private boolean hasCorrectModifierForMainMethod(final Method method) {
         final int modifiers = method.getModifiers();
         return !Modifier.isPrivate(modifiers) && !Modifier.isAbstract(modifiers);
+    }
+
+    private boolean isInstantiableInCaseOfInstanceMainMethod(final Class<?> owner, final Method method) {
+        if (!Modifier.isStatic(method.getModifiers())) {
+            Constructor<?>[] constructors = owner.getConstructors();
+            boolean isAbstract = Modifier.isAbstract(owner.getModifiers());
+            boolean hasNoArgsNonPrivateConstructor = Arrays.stream(constructors)
+                .anyMatch(item -> item.getParameterCount() == 0);
+            return !isAbstract && hasNoArgsNonPrivateConstructor;
+        }
+        else {
+            return true;
+        }
     }
 }
