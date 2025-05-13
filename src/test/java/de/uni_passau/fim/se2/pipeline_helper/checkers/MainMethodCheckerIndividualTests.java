@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import org.junit.jupiter.api.io.TempDir;
@@ -54,16 +53,20 @@ public class MainMethodCheckerIndividualTests {
     private static void compile(Path source, Path outputDirectory) throws IOException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         String classPath = Arrays.stream(System.getProperty("java.class.path").split(":"))
-                .filter(path -> !path.contains("target/test-classes"))
-                .collect(Collectors.joining(":"));
+            .filter(path -> !path.contains("target/test-classes"))
+            .collect(Collectors.joining(":"));
 
-        try (StandardJavaFileManager fm = compiler.getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)) {
+        try (
+            StandardJavaFileManager fm = compiler
+                .getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)
+        ) {
             compiler.getTask(
                 null, fm, null,
                 List.of(
-                        "-classpath", classPath,
-                        "-sourcepath", "src/test/java",
-                        "-d", outputDirectory.toString(), "-implicit:class"),
+                    "-classpath", classPath,
+                    "-sourcepath", "src/test/java",
+                    "-d", outputDirectory.toString(), "-implicit:class"
+                ),
                 null,
                 fm.getJavaFileObjectsFromFiles(List.of(source.toFile()))
             ).call();
