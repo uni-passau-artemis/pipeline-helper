@@ -12,8 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
@@ -51,14 +53,17 @@ public class MainMethodCheckerIndividualTests {
 
     private static void compile(Path source, Path outputDirectory) throws IOException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        try (
-            StandardJavaFileManager fm = compiler
-                .getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)
-        ) {
-            fm.setLocation(StandardLocation.CLASS_OUTPUT, List.of(outputDirectory.toFile()));
+        String classPath = Arrays.stream(System.getProperty("java.class.path").split(":"))
+                .filter(path -> !path.contains("target/test-classes"))
+                .collect(Collectors.joining(":"));
+
+        try (StandardJavaFileManager fm = compiler.getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)) {
             compiler.getTask(
                 null, fm, null,
-                List.of("-classpath", System.getProperty("java.class.path")),
+                List.of(
+                        "-classpath", classPath,
+                        "-sourcepath", "src/test/java",
+                        "-d", outputDirectory.toString(), "-implicit:class"),
                 null,
                 fm.getJavaFileObjectsFromFiles(List.of(source.toFile()))
             ).call();
@@ -75,14 +80,14 @@ public class MainMethodCheckerIndividualTests {
     @ParameterizedTest(name = "[INVALID] {0}")
     @MethodSource("getInvalidSources")
     void shouldRejectInvalidMainMethod(Path sourceFile, @TempDir Path tempDir) throws IOException, CheckerException {
-        CheckerResult result = copyCompileAndCheck(sourceFile, Paths.get("/home/stern/Downloads/Test/"));
+        CheckerResult result = copyCompileAndCheck(sourceFile, tempDir);
         assertFalse(result.isSuccessful());
     }
 
     @ParameterizedTest(name = "[VALID] {0}")
     @MethodSource("getValidSources")
     void shouldAcceptValidMainMethod(Path sourceFile, @TempDir Path tempDir) throws IOException, CheckerException {
-        CheckerResult result = copyCompileAndCheck(sourceFile, tempDir);
+        CheckerResult result = copyCompileAndCheck(sourceFile, tempDir); // Paths.get("/home/stern/Downloads/Test/"));
         assertTrue(result.isSuccessful());
     }
 }
