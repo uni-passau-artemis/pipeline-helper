@@ -4,7 +4,7 @@
 
 package de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.invalid;
 
-import de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.valid.SuperStaticProtected;
+import de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.valid.ProtectedStaticNoParam;
 
-public class SubStaticProtected extends SuperStaticProtected {
+public class SubStaticProtected extends ProtectedStaticNoParam {
 }

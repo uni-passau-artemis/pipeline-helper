@@ -4,7 +4,7 @@
 
 package de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.invalid;
 
-import de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.valid.SuperStaticPublic;
+import de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.valid.PublicStaticNoParam;
 
-public class SubStaticPublic extends SuperStaticPublic {
+public class SubStaticPublic extends PublicStaticNoParam {
 }

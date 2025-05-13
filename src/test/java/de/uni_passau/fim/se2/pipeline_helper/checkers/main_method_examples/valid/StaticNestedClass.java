@@ -6,7 +6,7 @@ package de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.vali
 
 public class StaticNestedClass {
 
-    public static class SubClass {
+    public static class NestedClass {
 
         public void main(String[] args) {
         }
