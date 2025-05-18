@@ -9,7 +9,8 @@ public enum EnumWithEmptyConstructorAndInstanceMain {
     A, B, C;
 
     // Constructor should be private.
-    EnumWithEmptyConstructorAndInstanceMain() {}
+    EnumWithEmptyConstructorAndInstanceMain() {
+    }
 
     public void main() {
     }
