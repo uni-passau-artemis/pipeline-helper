@@ -60,9 +60,10 @@ public class MainMethodCheckerIndividualTests {
             StandardJavaFileManager fm = compiler
                 .getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)
         ) {
-            compiler.getTask(
+            boolean ok = compiler.getTask(
                 null, fm, null,
                 List.of(
+                    "--release", System.getProperty("java.specification.version"),
                     "-classpath", classPath,
                     "-sourcepath", "src/test/java",
                     "-d", outputDirectory.toString(), "-implicit:class"
@@ -70,6 +71,10 @@ public class MainMethodCheckerIndividualTests {
                 null,
                 fm.getJavaFileObjectsFromFiles(List.of(source.toFile()))
             ).call();
+
+            if (!ok) {
+                throw new IOException("Compilation failed!");
+            }
         }
     }
 
