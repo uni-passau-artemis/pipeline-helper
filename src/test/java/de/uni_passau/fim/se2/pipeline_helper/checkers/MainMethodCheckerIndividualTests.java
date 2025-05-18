@@ -90,7 +90,7 @@ public class MainMethodCheckerIndividualTests {
     @ParameterizedTest(name = "[VALID] {0}")
     @MethodSource("getValidSources")
     void shouldAcceptValidMainMethod(Path sourceFile, @TempDir Path tempDir) throws IOException, CheckerException {
-        CheckerResult result = copyCompileAndCheck(sourceFile, tempDir); // Paths.get("/home/stern/Downloads/Test/"));
+        CheckerResult result = copyCompileAndCheck(sourceFile, tempDir);
         assertTrue(result.isSuccessful());
     }
 }
