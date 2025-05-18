@@ -4,9 +4,12 @@
 
 package de.uni_passau.fim.se2.pipeline_helper.checkers.main_method_examples.invalid;
 
-public enum EnumClassWithInstanceMain {
+public enum EnumWithEmptyConstructorAndInstanceMain {
 
     A, B, C;
+
+    // Constructor should be private.
+    EnumWithEmptyConstructorAndInstanceMain() {}
 
     public void main() {
     }
