@@ -6,4 +6,5 @@ open module pipeline.helper.main {
 
     requires info.picocli;
     requires com.google.gson;
+    requires java.compiler;
 }
