@@ -64,7 +64,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Download pre-build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: pipeline-helper.jar
           path: release
