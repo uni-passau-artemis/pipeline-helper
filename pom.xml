@@ -33,7 +33,7 @@ SPDX-License-Identifier: EUPL-1.2
         <jacoco.version>0.8.13</jacoco.version>
         <junit.version>5.12.2</junit.version>
         <picocli.version>4.7.7</picocli.version>
-        <spotless.version>2.44.4</spotless.version>
+        <spotless.version>3.0.0</spotless.version>
         <truth.version>1.4.4</truth.version>
     </properties>
 
