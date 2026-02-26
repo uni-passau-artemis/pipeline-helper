@@ -40,7 +40,7 @@ jobs:
       - name: Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@df268dd1684fb95352aa463056e3cf41f9acb94b
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: pipeline-helper.jar
           path: target/pipeline-helper-*-shaded.jar
@@ -64,7 +64,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Download pre-build artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: pipeline-helper.jar
           path: release
