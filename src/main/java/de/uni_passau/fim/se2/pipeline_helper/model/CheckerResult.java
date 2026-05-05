@@ -39,13 +39,19 @@ public class CheckerResult {
 
         this.name = name;
         this.successful = successful;
+        this.message = processMessage(message);
+    }
+
+    private String processMessage(String message) {
+        if (message == null) {
+            return null;
+        }
 
         if (isLongMessage(message)) {
-            this.message = message.substring(0, MAX_MESSAGE_LENGTH);
+            message = message.substring(0, MAX_MESSAGE_LENGTH);
         }
-        else {
-            this.message = message;
-        }
+
+        return message.replace('\0', '�');
     }
 
     private static boolean isLongMessage(final String message) {

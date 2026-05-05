@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-public class CheckerResultTest {
+class CheckerResultTest {
 
     @Test
     void shouldNotAllowEmptyMessageForFailedTests() {
@@ -40,5 +40,11 @@ public class CheckerResultTest {
         final CheckerResult result = new CheckerResult("checker", true, "ab" + "0".repeat(inputLength));
         assertThat(result.getMessage().length()).isLessThan(inputLength);
         assertThat(result.getMessage()).startsWith("ab");
+    }
+
+    @Test
+    void shouldReplaceNullCharacters() throws CheckerException {
+        final CheckerResult result = new CheckerResult("checker", true, "ab\0c\0\0d");
+        assertThat(result.getMessage()).isEqualTo("ab�c��d");
     }
 }
