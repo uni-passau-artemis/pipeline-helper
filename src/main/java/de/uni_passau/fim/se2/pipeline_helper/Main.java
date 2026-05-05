@@ -23,7 +23,7 @@ import picocli.CommandLine.*;
 
 @Command(
     name = "pipeline-helper",
-    version = "2.3.1-SNAPSHOT",
+    version = "2.3.1",
     mixinStandardHelpOptions = true,
     subcommandsRepeatable = true,
     showDefaultValues = true,
